@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Delicias</string>
+
+    <!-- Bottom Navigation View -->
+    <string name="home">home</string>
+    <string name="favorites">favorites</string>
+    <string name="map">map</string>
+    <string name="setting">setting</string>
 </resources>
