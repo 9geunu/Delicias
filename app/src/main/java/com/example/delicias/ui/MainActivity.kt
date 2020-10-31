@@ -65,10 +65,22 @@ class MainActivity : AppCompatActivity() {
         override fun onPageSelected(position: Int) {
             super.onPageSelected(position)
             nav_view.selectedItemId = when (position) {
-                0 -> R.id.action_home
-                1 -> R.id.action_favorite
-                2 -> R.id.action_map
-                3 -> R.id.action_setting
+                0 -> {
+                    view_pager.isUserInputEnabled = true
+                    R.id.action_home
+                }
+                1 -> {
+                    view_pager.isUserInputEnabled = true
+                    R.id.action_favorite
+                }
+                2 -> {
+                    view_pager.isUserInputEnabled = false
+                    R.id.action_map
+                }
+                3 -> {
+                    view_pager.isUserInputEnabled = true
+                    R.id.action_setting
+                }
                 else -> error("no such position: $position")
             }
         }
