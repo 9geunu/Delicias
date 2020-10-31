@@ -1,4 +1,10 @@
 package com.example.delicias.domain
 
-data class Menu(val menuName: String, val manuPrice: Int) {
-}
+import com.google.gson.annotations.SerializedName
+
+data class Menu(
+    @SerializedName("name")
+    val name: String,
+    @SerializedName("price")
+    val price: Int
+)
