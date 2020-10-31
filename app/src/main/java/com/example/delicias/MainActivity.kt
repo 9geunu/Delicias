@@ -1,31 +1,32 @@
 package com.example.delicias
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-import com.example.delicias.ui.FavoritesFragment
-import com.example.delicias.ui.HomeFragment
 import com.example.delicias.ui.MapFragment
 import com.example.delicias.ui.SettingFragment
+import com.example.delicias.ui.favorites.FavoritesFragment
+import com.example.delicias.ui.home.HomeFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
+    val adapter = PagerAdapter(supportFragmentManager, lifecycle)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        view_pager.adapter = PagerAdapter(supportFragmentManager, lifecycle)
+        view_pager.adapter = adapter
         view_pager.registerOnPageChangeCallback( PageChangeCallback() )
         nav_view.setOnNavigationItemSelectedListener { navigationSelected(it) }
     }
 
-    private inner class PagerAdapter(fm: FragmentManager, lc: Lifecycle): FragmentStateAdapter(fm, lc) {
+    inner class PagerAdapter(fm: FragmentManager, lc: Lifecycle): FragmentStateAdapter(fm, lc) {
         override fun getItemCount() = 4
         override fun createFragment(position: Int): Fragment {
             return when (position) {
