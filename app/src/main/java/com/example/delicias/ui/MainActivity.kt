@@ -1,4 +1,4 @@
-package com.example.delicias
+package com.example.delicias.ui
 
 import android.os.Bundle
 import android.view.MenuItem
@@ -8,8 +8,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-import com.example.delicias.ui.MapFragment
-import com.example.delicias.ui.SettingFragment
+import com.example.delicias.R
 import com.example.delicias.ui.favorites.FavoritesFragment
 import com.example.delicias.ui.home.HomeFragment
 import kotlinx.android.synthetic.main.activity_main.*
