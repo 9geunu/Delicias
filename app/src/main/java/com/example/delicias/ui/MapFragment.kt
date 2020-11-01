@@ -14,7 +14,10 @@ import com.naver.maps.geometry.LatLngBounds
 import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
+import com.naver.maps.map.overlay.Marker
+import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.util.FusedLocationSource
+import com.naver.maps.map.widget.LocationButtonView
 
 class MapFragment : Fragment(), OnMapReadyCallback {
     lateinit var binding: FragmentMapBinding
@@ -65,6 +68,31 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         this.naverMap.extent = LatLngBounds(LatLng(31.43, 122.37), LatLng(44.35, 132.0))
         val uiSettings = this.naverMap.uiSettings
         uiSettings.isLocationButtonEnabled = true
+        uiSettings.isZoomControlEnabled = false
+
+        setMarkers(naverMap)
+    }
+
+    private fun setMarkers(naverMap: NaverMap) {
+        val studentsHallMarker = Marker()
+        studentsHallMarker.icon = OverlayImage.fromResource(R.drawable.pin)
+        studentsHallMarker.position = LatLng(37.459266, 126.950599)
+        studentsHallMarker.map = naverMap
+
+        val ourHomeMarker = Marker()
+        ourHomeMarker.icon = OverlayImage.fromResource(R.drawable.pin)
+        ourHomeMarker.position = LatLng(37.462069, 126.957797)
+        ourHomeMarker.map = naverMap
+
+        val threeZeroOneMarker = Marker()
+        threeZeroOneMarker.icon = OverlayImage.fromResource(R.drawable.pin)
+        threeZeroOneMarker.position = LatLng(37.450286, 126.952648)
+        threeZeroOneMarker.map = naverMap
+
+        val thirdRestaurantMarker = Marker()
+        thirdRestaurantMarker.icon = OverlayImage.fromResource(R.drawable.pin)
+        thirdRestaurantMarker.position = LatLng(37.456067, 126.948640)
+        thirdRestaurantMarker.map = naverMap
     }
 
     companion object {
