@@ -11,11 +11,13 @@ import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.delicias.R
 import com.example.delicias.data.repository.RestaurantDataRepository
 import com.example.delicias.data.repository.datasource.LocalRestaurantDataStore
 import com.example.delicias.databinding.FragmentMapBinding
 import com.example.delicias.domain.Restaurant
+import com.example.delicias.ui.MenuAdapter
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.geometry.LatLngBounds
 import com.naver.maps.map.LocationTrackingMode
@@ -45,12 +47,17 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private val listener = Overlay.OnClickListener { overlay ->
         Log.d("delitag", "setMarkers: ${overlay.tag} 클릭됨")
         runBlocking{
-            binding.restaurant = restaurantDataRepository.getRestaurantById(overlay.tag as Long).first()
+            val restaurant = restaurantDataRepository.getRestaurantById(overlay.tag as Long).first()
+            binding.restaurant = restaurant
+            binding.rvMenuItem.layoutManager = LinearLayoutManager(context)
+            binding.rvMenuItem.adapter = MenuAdapter(restaurant.lunch.menus)
         }
-        if (binding.cvRestaurantInfo.isVisible) {
-            binding.cvRestaurantInfo.visibility = View.INVISIBLE
-        } else
-            binding.cvRestaurantInfo.visibility = View.VISIBLE
+        if (mapViewModel.mapSizePercentage.value != 40F) {
+            if (binding.cvRestaurantInfo.isVisible) {
+                mapViewModel.setRestaurantInfoInVisible()
+            } else
+                mapViewModel.setRestaurantInfoVisible()
+        }
         true
     }
 
@@ -66,7 +73,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val factory = MapViewModelFactory(restaurantDataRepository, requireContext())
         mapViewModel = ViewModelProviders.of(this, factory).get(MapViewModel::class.java)
 
-        binding.viewModel = mapViewModel;
+        binding.lifecycleOwner = viewLifecycleOwner
+        binding.viewModel = mapViewModel
 
         val fm = childFragmentManager
         val mapFragment = fm.findFragmentById(R.id.map) as com.naver.maps.map.MapFragment?
@@ -127,6 +135,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         naverMap.setOnMapClickListener { pointF, latLng ->
             if (binding.cvRestaurantInfo.isVisible)
                 binding.cvRestaurantInfo.visibility = View.INVISIBLE
+
+            if (mapViewModel.mapSizePercentage.value == 40F)
+                mapViewModel.setRestaurantDetailInfoInvisible()
+
+            if (binding.cvNmapDeeplink.isVisible)
+                mapViewModel.setNMapAppDeeplinkCardViewInvisible()
         }
 
         val studentsHallMarker = Marker()
@@ -164,5 +178,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1000
     }
+
 
 }
