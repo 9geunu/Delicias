@@ -15,6 +15,9 @@ abstract class RestaurantDao : BaseDao<Restaurant>{
     @Query("SELECT * FROM restaurant WHERE name = :name")
     abstract fun getRestaurantByName(name: String): Flow<Restaurant>
 
+    @Query("SELECT * FROM restaurant WHERE id = :id")
+    abstract fun getRestaurantById(id: Long): Flow<Restaurant>
+
     @Query("DELETE  FROM restaurant")
     abstract suspend fun deleteAll()
 
@@ -47,4 +50,13 @@ abstract class RestaurantDao : BaseDao<Restaurant>{
     protected abstract fun getAllFavoriteDinner(isFavorite: Boolean): Flow<List<RestaurantMinimal>>
 
     fun getAllFavoriteDinner() = getAllFavoriteDinner(true).distinctUntilChanged()
+
+    @Query("SELECT name, breakfast_menus AS menus, breakfast_message AS message, breakfast_isValid AS isValid, isFavorite FROM restaurant WHERE name LIKE :searchquery")
+    abstract fun searchForBreakfast(searchquery: String): Flow<List<RestaurantMinimal>>
+
+    @Query("SELECT name, lunch_menus AS menus, lunch_message AS message, lunch_isValid AS isValid, isFavorite FROM restaurant WHERE name LIKE :searchquery")
+    abstract fun searchForLunch(searchquery: String): Flow<List<RestaurantMinimal>>
+
+    @Query("SELECT name, dinner_menus AS menus, dinner_message AS message, dinner_isValid AS isValid, isFavorite FROM restaurant WHERE name LIKE :searchquery")
+    abstract fun searchForDinner(searchquery: String): Flow<List<RestaurantMinimal>>
 }

@@ -2,10 +2,8 @@ package com.example.delicias.ui.home
 
 import androidx.lifecycle.*
 import com.example.delicias.domain.Restaurant
-import com.example.delicias.domain.Date
 import com.example.delicias.domain.RestaurantMinimal
 import com.example.delicias.domain.repository.RestaurantRepository
-import com.example.delicias.util.Util
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 
@@ -30,5 +28,17 @@ class HomeViewModel(private val repository: RestaurantRepository) : ViewModel(){
 
     fun getAllDinner(): LiveData<List<RestaurantMinimal>> {
         return repository.getAllDinner().asLiveData(Dispatchers.Default + viewModelScope.coroutineContext)
+    }
+
+    fun searchForBreakfast(query: String): LiveData<List<RestaurantMinimal>>{
+        return repository.searchForBreakfast(query).asLiveData(Dispatchers.Default + viewModelScope.coroutineContext)
+    }
+
+    fun searchForLunch(query: String): LiveData<List<RestaurantMinimal>>{
+        return repository.searchForLunch(query).asLiveData(Dispatchers.Default + viewModelScope.coroutineContext)
+    }
+
+    fun searchForDinner(query: String): LiveData<List<RestaurantMinimal>>{
+        return repository.searchForDinner(query).asLiveData(Dispatchers.Default + viewModelScope.coroutineContext)
     }
 }

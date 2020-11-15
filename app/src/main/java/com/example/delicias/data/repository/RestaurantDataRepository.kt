@@ -6,11 +6,24 @@ import com.example.delicias.data.repository.datasource.RestaurantDao
 import com.example.delicias.domain.RestaurantMinimal
 import com.example.delicias.domain.repository.RestaurantRepository
 import kotlinx.coroutines.flow.Flow
+import java.lang.Exception
 
 class RestaurantDataRepository(private val restaurantDao: RestaurantDao) : RestaurantRepository{
 
     override fun getRestaurantsFromRemote(): Flow<List<Restaurant>> {
-        return RemoteRestaurantDataStore().getAllRestaurants()
+        return try {
+            RemoteRestaurantDataStore().getAllRestaurants()
+        } catch (e: Exception){
+            restaurantDao.getRestaurants()
+        }
+    }
+
+    override fun getAllRestaurants(): Flow<List<Restaurant>> {
+        return restaurantDao.getRestaurants()
+    }
+
+    override fun getRestaurantById(id: Long): Flow<Restaurant> {
+        return restaurantDao.getRestaurantById(id)
     }
 
     override suspend fun insertRestaurant(restaurant: Restaurant) {
@@ -47,5 +60,17 @@ class RestaurantDataRepository(private val restaurantDao: RestaurantDao) : Resta
 
     override fun getAllFavoriteDinner(): Flow<List<RestaurantMinimal>> {
         return restaurantDao.getAllFavoriteDinner()
+    }
+
+    override fun searchForBreakfast(searchquery: String): Flow<List<RestaurantMinimal>> {
+        return restaurantDao.searchForBreakfast(searchquery)
+    }
+
+    override fun searchForLunch(searchquery: String): Flow<List<RestaurantMinimal>> {
+        return restaurantDao.searchForLunch(searchquery)
+    }
+
+    override fun searchForDinner(searchquery: String): Flow<List<RestaurantMinimal>> {
+        return restaurantDao.searchForDinner(searchquery)
     }
 }
