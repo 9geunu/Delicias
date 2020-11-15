@@ -19,19 +19,36 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/shape_setting_item">
 
-                    <TextView
-                        android:id="@+id/tv_toolbar"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintLeft_toRightOf="parent"
-                        app:layout_constraintRight_toLeftOf="parent"
-                        android:padding="8dp"
-                        android:text="설정"
-                        android:textStyle="bold"
-                        android:textSize="16sp"
-                        android:textColor="#ed4e31"
-                        android:layout_gravity="center"/>
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <ImageButton
+                            android:id="@+id/iv_back_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:background="#00FFFFFF"
+                            android:src="@drawable/abc_vector_test"
+                            android:tint="#adb5bd"
+                            android:padding="8dp"
+                            app:layout_constraintTop_toBottomOf="parent"
+                            app:layout_constraintBottom_toTopOf="parent"
+                            app:layout_constraintLeft_toLeftOf="parent"/>
+
+                        <TextView
+                            android:id="@+id/tv_toolbar"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintTop_toTopOf="@+id/iv_back_button"
+                            app:layout_constraintLeft_toRightOf="parent"
+                            app:layout_constraintRight_toLeftOf="parent"
+                            android:padding="8dp"
+                            android:text="만든 사람들"
+                            android:textStyle="bold"
+                            android:textSize="16sp"
+                            android:textColor="#ed4e31"/>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
                 </com.google.android.material.appbar.AppBarLayout>
             </androidx.coordinatorlayout.widget.CoordinatorLayout>
         </LinearLayout>
@@ -47,7 +64,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
-                android:text="공지사항"
+                android:text="iOS"
                 android:textSize="16sp"/>
         </LinearLayout>
 
@@ -62,7 +79,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
-                android:text="의견 보내기"
+                android:text="android"
                 android:textSize="16sp"/>
         </LinearLayout>
 
@@ -77,7 +94,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
-                android:text="버전 정보"
+                android:text="backend"
                 android:textSize="16sp"/>
             <TextView
                 android:layout_width="wrap_content"
@@ -99,52 +116,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
-                android:text="메뉴 없는 식당 안보기"
+                android:text="design"
                 android:textSize="16sp"/>
-
-            <Switch
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="170dp"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_marginTop="16dp"
-            android:id="@+id/ll_see_developer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/shape_setting_item"
-            android:paddingTop="12dp"
-            android:paddingBottom="12dp">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:text="만든 사람들"
-                android:textSize="16sp"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/ll_server_info"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/shape_setting_item"
-            android:paddingTop="12dp"
-            android:paddingBottom="12dp">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:text="서버"
-                android:textSize="16sp"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="280dp"
-                android:text="Mock"
-                android:textSize="16sp"
-                android:textColor="#ed4e31"/>
         </LinearLayout>
     </LinearLayout>
 </layout>
