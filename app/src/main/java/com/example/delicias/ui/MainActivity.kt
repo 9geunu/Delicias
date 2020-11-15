@@ -9,8 +9,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.example.delicias.R
+import com.example.delicias.ui.setting.SettingFragment
 import com.example.delicias.ui.favorites.FavoritesFragment
 import com.example.delicias.ui.home.HomeFragment
+import com.example.delicias.ui.map.MapFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -82,6 +84,23 @@ class MainActivity : AppCompatActivity() {
                     R.id.action_setting
                 }
                 else -> error("no such position: $position")
+            }
+        }
+    }
+
+    override fun onBackPressed() {
+        when(view_pager.currentItem){
+            0 -> {
+                super.onBackPressed()
+            }
+            1 -> {
+                view_pager.currentItem = 0
+            }
+            2 -> {
+                view_pager.currentItem = 0
+            }
+            3 -> {
+                view_pager.currentItem = 0
             }
         }
     }
