@@ -17,6 +17,10 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
     val adapter = PagerAdapter(supportFragmentManager, lifecycle)
+    lateinit var homeFragment: HomeFragment
+    lateinit var favoritesFragment: FavoritesFragment
+    lateinit var mapFragment: MapFragment
+    lateinit var settingFragment: SettingFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,10 +35,22 @@ class MainActivity : AppCompatActivity() {
         override fun getItemCount() = 4
         override fun createFragment(position: Int): Fragment {
             return when (position) {
-                0 -> HomeFragment()
-                1 -> FavoritesFragment()
-                2 -> MapFragment()
-                3 -> SettingFragment()
+                0 -> {
+                    homeFragment = HomeFragment()
+                    return homeFragment
+                }
+                1 -> {
+                    favoritesFragment = FavoritesFragment()
+                    return favoritesFragment
+                }
+                2 -> {
+                    mapFragment = MapFragment()
+                    return mapFragment
+                }
+                3 -> {
+                    settingFragment = SettingFragment()
+                    return settingFragment
+                }
                 else -> error("no such position: $position")
             }
         }
@@ -97,7 +113,8 @@ class MainActivity : AppCompatActivity() {
                 view_pager.currentItem = 0
             }
             2 -> {
-                view_pager.currentItem = 0
+                if (mapFragment.onBackPress())
+                    view_pager.currentItem = 0
             }
             3 -> {
                 view_pager.currentItem = 0
