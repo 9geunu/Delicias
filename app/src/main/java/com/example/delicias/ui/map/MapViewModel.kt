@@ -7,11 +7,10 @@ import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.delicias.domain.Restaurant
 import com.example.delicias.domain.repository.RestaurantRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.net.URLEncoder
 
@@ -19,6 +18,7 @@ import java.net.URLEncoder
 class MapViewModel(private val repository: RestaurantRepository, private val context: Context) : ViewModel() {
     var isNMapAppDeeplinkCardViewVisible = MutableLiveData<Boolean>()
     var isRestaurantInfoCardViewVisible = MutableLiveData<Boolean>()
+    var isRestaurantSearchResultVisible = MutableLiveData<Boolean>()
     var mapSizePercentage = MutableLiveData<Float>(100F)
 
     fun onFavoriteButtonClick(restaurant: Restaurant){
@@ -94,5 +94,21 @@ class MapViewModel(private val repository: RestaurantRepository, private val con
 
     fun setRestaurantDetailInfoInvisible(){
         mapSizePercentage.value = 100F
+    }
+
+    fun setRestaurantSearchResultVisible(){
+        isRestaurantSearchResultVisible.value = true
+    }
+
+    fun setRestaurantSearchResultInvisible(){
+        isRestaurantSearchResultVisible.value = false
+    }
+
+    fun isMapFullSize(): Boolean{
+        return mapSizePercentage.value != 40F
+    }
+
+    fun searchRestaurant(query: String): LiveData<List<Restaurant>> {
+        return repository.searchRestaurant(query).asLiveData(Dispatchers.Default + viewModelScope.coroutineContext)
     }
 }

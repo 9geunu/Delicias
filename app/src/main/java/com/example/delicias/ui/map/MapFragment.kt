@@ -7,17 +7,20 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.delicias.R
 import com.example.delicias.data.repository.RestaurantDataRepository
 import com.example.delicias.data.repository.datasource.LocalRestaurantDataStore
 import com.example.delicias.databinding.FragmentMapBinding
-import com.example.delicias.domain.Restaurant
 import com.example.delicias.ui.MenuAdapter
+import com.example.delicias.ui.RestaurantSearchAdapter
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.geometry.LatLngBounds
 import com.naver.maps.map.LocationTrackingMode
@@ -27,38 +30,47 @@ import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.Overlay
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.util.FusedLocationSource
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.runBlocking
 import java.util.concurrent.Executors
 
-class MapFragment : Fragment(), OnMapReadyCallback {
+class MapFragment : Fragment(), OnMapReadyCallback, SearchView.OnQueryTextListener {
     lateinit var binding: FragmentMapBinding
     private lateinit var locationSource: FusedLocationSource
     private lateinit var naverMap: NaverMap
     lateinit var mapViewModel: MapViewModel
     lateinit var restaurantDataRepository: RestaurantDataRepository
+    lateinit var restaurantSearchAdapter: RestaurantSearchAdapter
     private val executorService = Executors.newSingleThreadExecutor()
     private val handler = Handler(Looper.getMainLooper())
     private var isMapReady = false
     private val pinImage = OverlayImage.fromResource(R.drawable.pin)
+    private val pinDetailImage = OverlayImage.fromResource(R.drawable.pin_detail)
+    private var markers = mutableListOf<Marker>()
     private val listener = Overlay.OnClickListener { overlay ->
-        Log.d("delitag", "setMarkers: ${overlay.tag} 클릭됨")
+        val marker = overlay as Marker
+        Log.d("delitag", "setMarkers: ${marker.tag} 클릭됨")
         runBlocking{
-            val restaurant = restaurantDataRepository.getRestaurantById(overlay.tag as Long).first()
+            val restaurant = restaurantDataRepository.getRestaurantById(marker.tag as Long).first()
             binding.restaurant = restaurant
             binding.rvMenuItem.layoutManager = LinearLayoutManager(context)
             binding.rvMenuItem.adapter = MenuAdapter(restaurant.lunch.menus)
+            MenuAdapter(restaurant.lunch.menus)
         }
-        if (mapViewModel.mapSizePercentage.value != 40F) {
+        if (mapViewModel.isMapFullSize()) {
             if (binding.cvRestaurantInfo.isVisible) {
                 mapViewModel.setRestaurantInfoInVisible()
-            } else
+                marker.icon = pinImage
+            } else {
                 mapViewModel.setRestaurantInfoVisible()
+                marker.icon = pinDetailImage
+            }
         }
         true
+    }
+    private val onCloseListener = SearchView.OnCloseListener {
+        mapViewModel.setRestaurantSearchResultInvisible()
+        false
     }
 
     override fun onCreateView(
@@ -68,13 +80,21 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_map, container, false)
         val restaurantDao = LocalRestaurantDataStore.getInstance(this.requireContext()).restaurantDao()
+        val restaurantMinimalDao = LocalRestaurantDataStore.getInstance(this.requireContext()).restaurantMinimalDao()
 
-        restaurantDataRepository = RestaurantDataRepository(restaurantDao)
+        restaurantDataRepository = RestaurantDataRepository(restaurantDao, restaurantMinimalDao)
         val factory = MapViewModelFactory(restaurantDataRepository, requireContext())
         mapViewModel = ViewModelProviders.of(this, factory).get(MapViewModel::class.java)
 
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = mapViewModel
+        binding.svSearchRestaurant.setOnQueryTextListener(this)
+
+        binding.svSearchRestaurant.setOnSearchClickListener {
+            mapViewModel.setRestaurantSearchResultVisible()
+        }
+
+        binding.svSearchRestaurant.setOnCloseListener(onCloseListener)
 
         val fm = childFragmentManager
         val mapFragment = fm.findFragmentById(R.id.map) as com.naver.maps.map.MapFragment?
@@ -113,65 +133,76 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onMapReady(naverMap: NaverMap) {
-        Log.d("delishas", "onMapReady!")
+        Log.d("delitag", "onMapReady!")
         this.naverMap = naverMap
         this.naverMap.locationSource = locationSource
         this.naverMap.mapType = NaverMap.MapType.Basic
-        this.naverMap.minZoom = 7.0
+        this.naverMap.minZoom = 13.9
         this.naverMap.maxZoom = 19.0
         this.naverMap.isIndoorEnabled = true
-        this.naverMap.extent = LatLngBounds(LatLng(31.43, 122.37), LatLng(44.35, 132.0))
+        this.naverMap.extent = LatLngBounds(LatLng(37.446082, 126.947008), LatLng(37.469290, 126.962146))
         val uiSettings = this.naverMap.uiSettings
-        uiSettings.isLocationButtonEnabled = true
+        uiSettings.isLocationButtonEnabled = false
         uiSettings.isZoomControlEnabled = false
 
+        restaurantSearchAdapter = RestaurantSearchAdapter(naverMap, mapViewModel)
+
+        binding.rvSearchRestaurantList.layoutManager = LinearLayoutManager(this.requireContext())
+        binding.rvSearchRestaurantList.itemAnimator = DefaultItemAnimator()
+        binding.rvSearchRestaurantList.adapter = restaurantSearchAdapter
+
         executorService.submit {
+            setNaverMapOnClickListener(naverMap)
             setMarkers(naverMap)
             isMapReady = true
         }
     }
 
     private fun setMarkers(naverMap: NaverMap) {
+        Log.d("delitag", "setMarkers")
+
+        if (markers.isNotEmpty())
+            markers.clear()
+
+        if (markers.isEmpty()) {
+            runBlocking {
+                restaurantDataRepository.getAllRestaurants().first().forEach { restaurant ->
+                    Log.d("delitag", restaurant.toString())
+                    markers.add(Marker().apply {
+                        tag = restaurant.id
+                        icon = pinImage
+                        position = LatLng(restaurant.latitude, restaurant.longitude)
+                        onClickListener = listener
+                    })
+                }
+            }
+        }
+
+        handler.post {
+            markers.forEach { marker ->
+                marker.map = naverMap
+            }
+        }
+    }
+
+    private fun setNaverMapOnClickListener(naverMap: NaverMap) {
         naverMap.setOnMapClickListener { pointF, latLng ->
             if (binding.cvRestaurantInfo.isVisible)
-                binding.cvRestaurantInfo.visibility = View.INVISIBLE
+                mapViewModel.setRestaurantInfoInVisible()
 
             if (mapViewModel.mapSizePercentage.value == 40F)
                 mapViewModel.setRestaurantDetailInfoInvisible()
 
             if (binding.cvNmapDeeplink.isVisible)
                 mapViewModel.setNMapAppDeeplinkCardViewInvisible()
-        }
 
-        val studentsHallMarker = Marker()
-        studentsHallMarker.tag = 1.toLong()
-        studentsHallMarker.icon = pinImage
-        studentsHallMarker.position = LatLng(37.459266, 126.950599)
-        studentsHallMarker.onClickListener = listener
+            onCloseListener.onClose()
 
-        val thirdRestaurantMarker = Marker()
-        thirdRestaurantMarker.tag = 2.toLong()
-        thirdRestaurantMarker.icon = pinImage
-        thirdRestaurantMarker.position = LatLng(37.456067, 126.948640)
-        thirdRestaurantMarker.onClickListener = listener
-
-        val ourHomeMarker = Marker()
-        ourHomeMarker.tag = 3.toLong()
-        ourHomeMarker.icon = pinImage
-        ourHomeMarker.position = LatLng(37.462069, 126.957797)
-        ourHomeMarker.onClickListener = listener
-
-        val threeZeroOneMarker = Marker()
-        threeZeroOneMarker.tag = 4.toLong()
-        threeZeroOneMarker.icon = pinImage
-        threeZeroOneMarker.position = LatLng(37.450286, 126.952648)
-        threeZeroOneMarker.onClickListener = listener
-
-        handler.post {
-            studentsHallMarker.map = naverMap
-            thirdRestaurantMarker.map = naverMap
-            ourHomeMarker.map = naverMap
-            threeZeroOneMarker.map = naverMap
+            markers.filter { marker ->
+                marker.icon == pinDetailImage
+            }.forEach { marker ->
+                marker.icon = pinImage
+            }
         }
     }
 
@@ -179,5 +210,53 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1000
     }
 
+    fun onBackPress(): Boolean{
+        markers.filter { marker ->
+            marker.icon == pinDetailImage
+        }.forEach { marker ->
+            marker.icon = pinImage
+        }
 
+        return if (binding.cvRestaurantInfo.isVisible) {
+            mapViewModel.setRestaurantInfoInVisible()
+            false
+        } else if (mapViewModel.mapSizePercentage.value == 40F) {
+            mapViewModel.setRestaurantDetailInfoInvisible()
+            false
+        } else if (binding.cvNmapDeeplink.isVisible) {
+            mapViewModel.setNMapAppDeeplinkCardViewInvisible()
+            false
+        } else true
+    }
+
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        if (query.isNullOrEmpty())
+            mapViewModel.setRestaurantSearchResultInvisible()
+
+        if (query != null) {
+            getResults(query)
+        }
+        return false
+    }
+
+    override fun onQueryTextChange(newText: String?): Boolean {
+        if (newText.isNullOrEmpty())
+            mapViewModel.setRestaurantSearchResultInvisible()
+
+        if (newText != null) {
+            getResults(newText)
+        }
+        return false
+    }
+
+    private fun getResults(newText: String) {
+        if (!binding.svSearchRestaurant.isVisible)
+            mapViewModel.setRestaurantSearchResultVisible()
+
+        val queryText = "%$newText%"
+        mapViewModel.searchRestaurant(queryText).observe(viewLifecycleOwner, Observer {
+            if (it != null)
+                restaurantSearchAdapter.submitList(it)
+        })
+    }
 }
