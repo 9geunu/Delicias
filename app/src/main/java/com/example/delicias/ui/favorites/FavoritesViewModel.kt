@@ -1,7 +1,9 @@
 package com.example.delicias.ui.favorites
 
-import androidx.lifecycle.*
-import com.example.delicias.domain.Restaurant
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.delicias.domain.Date
 import com.example.delicias.domain.RestaurantMinimal
 import com.example.delicias.domain.repository.RestaurantRepository
@@ -23,5 +25,9 @@ class FavoritesViewModel(private val repository: RestaurantRepository) : ViewMod
 
     fun getAllFavoriteDinner(): LiveData<List<RestaurantMinimal>> {
         return repository.getAllFavoriteDinner().asLiveData(viewModelScope.coroutineContext)
+    }
+
+    fun getAllRestaurantMinimal(): LiveData<List<RestaurantMinimal>> {
+        return repository.getAllRestaurantMinimals().asLiveData(viewModelScope.coroutineContext)
     }
 }

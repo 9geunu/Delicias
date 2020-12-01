@@ -31,6 +31,7 @@ class FavoritesFragment : Fragment() {
     var dateData = MutableLiveData<ArrayList<Date>>()
     lateinit var restaurantMinimalAdapter: RestaurantMinimalAdapter
     lateinit var lifecycleOwner: LifecycleOwner
+    lateinit var restaurantDataRepository :RestaurantDataRepository
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,8 +41,10 @@ class FavoritesFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_favorites, container, false)
         lifecycleOwner = viewLifecycleOwner
         val restaurantDao = LocalRestaurantDataStore.getInstance(this.requireContext()).restaurantDao()
+        val restaurantMinimalDao = LocalRestaurantDataStore.getInstance(this.requireContext()).restaurantMinimalDao()
 
-        val factory = FavoritesViewModelFactory(RestaurantDataRepository(restaurantDao))
+        restaurantDataRepository = RestaurantDataRepository(restaurantDao, restaurantMinimalDao)
+        val factory = FavoritesViewModelFactory(restaurantDataRepository)
         favoritesViewModel = ViewModelProviders.of(this, factory).get(FavoritesViewModel::class.java)
 
         restaurantMinimalAdapter = RestaurantMinimalAdapter(this.requireContext(), favoritesViewModel)
