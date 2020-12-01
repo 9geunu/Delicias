@@ -27,36 +27,48 @@ abstract class RestaurantDao : BaseDao<Restaurant>{
     fun getFavoriteRestaurants(): Flow<List<Restaurant>>
     = getFavoriteRestaurants(true).distinctUntilChanged()
 
-    @Query("SELECT name, breakfast_menus AS menus, breakfast_message AS message, breakfast_isValid AS isValid, isFavorite FROM restaurant")
+    @Query("SELECT id, name, breakfast_menus AS menus, breakfast_message AS message, breakfast_isValid AS isValid, isFavorite FROM restaurant")
     abstract fun getAllBreakfast(): Flow<List<RestaurantMinimal>>
 
-    @Query("SELECT name, lunch_menus AS menus, lunch_message AS message, lunch_isValid AS isValid, isFavorite FROM restaurant")
+    @Query("SELECT id, name, lunch_menus AS menus, lunch_message AS message, lunch_isValid AS isValid, isFavorite FROM restaurant")
     abstract fun getAllLunch(): Flow<List<RestaurantMinimal>>
 
-    @Query("SELECT name, dinner_menus AS menus, dinner_message AS message, dinner_isValid AS isValid, isFavorite FROM restaurant")
+    @Query("SELECT id, name, dinner_menus AS menus, dinner_message AS message, dinner_isValid AS isValid, isFavorite FROM restaurant")
     abstract fun getAllDinner(): Flow<List<RestaurantMinimal>>
 
-    @Query("SELECT name, breakfast_menus AS menus, breakfast_message AS message, breakfast_isValid AS isValid, isFavorite FROM restaurant WHERE isFavorite = :isFavorite")
+    @Query("SELECT id, name, breakfast_menus AS menus, breakfast_message AS message, breakfast_isValid AS isValid, isFavorite FROM restaurant WHERE isFavorite = :isFavorite")
     protected abstract fun getAllFavoriteBreakfast(isFavorite: Boolean): Flow<List<RestaurantMinimal>>
 
     fun getAllFavoriteBreakfast() = getAllFavoriteBreakfast(true).distinctUntilChanged()
 
-    @Query("SELECT name, lunch_menus AS menus, lunch_message AS message, lunch_isValid AS isValid, isFavorite FROM restaurant WHERE isFavorite = :isFavorite")
+    @Query("SELECT id, name, lunch_menus AS menus, lunch_message AS message, lunch_isValid AS isValid, isFavorite FROM restaurant WHERE isFavorite = :isFavorite")
     protected abstract fun getAllFavoriteLunch(isFavorite: Boolean): Flow<List<RestaurantMinimal>>
 
     fun getAllFavoriteLunch() = getAllFavoriteLunch(true).distinctUntilChanged()
 
-    @Query("SELECT name, dinner_menus AS menus, dinner_message AS message, dinner_isValid AS isValid, isFavorite FROM restaurant WHERE isFavorite = :isFavorite")
+    @Query("SELECT id, name, dinner_menus AS menus, dinner_message AS message, dinner_isValid AS isValid, isFavorite FROM restaurant WHERE isFavorite = :isFavorite")
     protected abstract fun getAllFavoriteDinner(isFavorite: Boolean): Flow<List<RestaurantMinimal>>
 
     fun getAllFavoriteDinner() = getAllFavoriteDinner(true).distinctUntilChanged()
 
-    @Query("SELECT name, breakfast_menus AS menus, breakfast_message AS message, breakfast_isValid AS isValid, isFavorite FROM restaurant WHERE name LIKE :searchquery")
+    @Query("SELECT id, name, breakfast_menus AS menus, breakfast_message AS message, breakfast_isValid AS isValid, isFavorite FROM restaurant WHERE name LIKE :searchquery")
     abstract fun searchForBreakfast(searchquery: String): Flow<List<RestaurantMinimal>>
 
-    @Query("SELECT name, lunch_menus AS menus, lunch_message AS message, lunch_isValid AS isValid, isFavorite FROM restaurant WHERE name LIKE :searchquery")
+    @Query("SELECT id, name, lunch_menus AS menus, lunch_message AS message, lunch_isValid AS isValid, isFavorite FROM restaurant WHERE name LIKE :searchquery")
     abstract fun searchForLunch(searchquery: String): Flow<List<RestaurantMinimal>>
 
-    @Query("SELECT name, dinner_menus AS menus, dinner_message AS message, dinner_isValid AS isValid, isFavorite FROM restaurant WHERE name LIKE :searchquery")
+    @Query("SELECT id, name, dinner_menus AS menus, dinner_message AS message, dinner_isValid AS isValid, isFavorite FROM restaurant WHERE name LIKE :searchquery")
     abstract fun searchForDinner(searchquery: String): Flow<List<RestaurantMinimal>>
+
+    @Query("SELECT * FROM restaurant WHERE name LIKE :searchquery")
+    abstract fun searchRestaurant(searchquery: String): Flow<List<Restaurant>>
+
+    @Query("UPDATE restaurant SET isFavorite = :isFavorite WHERE id = :id")
+    protected abstract suspend fun updateIsFavoriteOfRestaurantById(isFavorite: Boolean, id: Long)
+
+    suspend fun updateRestaurantAsFavorite(id: Long) = updateIsFavoriteOfRestaurantById(true, id)
+
+    suspend fun updateRestaurantAsNotFavorite(id: Long) = updateIsFavoriteOfRestaurantById(false, id)
+
+
 }

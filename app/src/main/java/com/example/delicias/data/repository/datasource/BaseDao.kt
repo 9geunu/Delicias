@@ -8,6 +8,10 @@ interface BaseDao<T> {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(obj: T)
 
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(objs: List<T>)
+
     @Delete
     suspend fun delete(obj: T)
 }

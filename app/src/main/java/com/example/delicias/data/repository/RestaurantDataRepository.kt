@@ -3,12 +3,15 @@ package com.example.delicias.data.repository
 import com.example.delicias.data.repository.datasource.RemoteRestaurantDataStore
 import com.example.delicias.domain.Restaurant
 import com.example.delicias.data.repository.datasource.RestaurantDao
+import com.example.delicias.data.repository.datasource.RestaurantMinimalDao
 import com.example.delicias.domain.RestaurantMinimal
 import com.example.delicias.domain.repository.RestaurantRepository
 import kotlinx.coroutines.flow.Flow
 import java.lang.Exception
 
-class RestaurantDataRepository(private val restaurantDao: RestaurantDao) : RestaurantRepository{
+class RestaurantDataRepository(
+    private val restaurantDao: RestaurantDao,
+    private val restaurantMinimalDao: RestaurantMinimalDao) : RestaurantRepository{
 
     override fun getRestaurantsFromRemote(): Flow<List<Restaurant>> {
         return try {
@@ -20,6 +23,10 @@ class RestaurantDataRepository(private val restaurantDao: RestaurantDao) : Resta
 
     override fun getAllRestaurants(): Flow<List<Restaurant>> {
         return restaurantDao.getRestaurants()
+    }
+
+    override fun getAllRestaurantMinimals(): Flow<List<RestaurantMinimal>> {
+        return restaurantMinimalDao.getRestaurantMinimals()
     }
 
     override fun getRestaurantById(id: Long): Flow<Restaurant> {
@@ -36,6 +43,10 @@ class RestaurantDataRepository(private val restaurantDao: RestaurantDao) : Resta
 
     override suspend fun deleteAllRestaurant() {
         restaurantDao.deleteAll()
+    }
+
+    override suspend fun updateRestaurantMinimals(restaurantMinimals: List<RestaurantMinimal>) {
+        restaurantMinimalDao.updateRestaurantMinimals(restaurantMinimals)
     }
 
     override fun getAllBreakfast(): Flow<List<RestaurantMinimal>> {
@@ -72,5 +83,9 @@ class RestaurantDataRepository(private val restaurantDao: RestaurantDao) : Resta
 
     override fun searchForDinner(searchquery: String): Flow<List<RestaurantMinimal>> {
         return restaurantDao.searchForDinner(searchquery)
+    }
+
+    override fun searchRestaurant(searchquery: String): Flow<List<Restaurant>> {
+        return restaurantDao.searchRestaurant(searchquery)
     }
 }

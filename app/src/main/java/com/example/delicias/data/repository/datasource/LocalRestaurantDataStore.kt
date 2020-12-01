@@ -9,10 +9,11 @@ import com.example.delicias.data.Converters
 import com.example.delicias.domain.Restaurant
 import com.example.delicias.domain.RestaurantMinimal
 
-@Database(entities = [RestaurantMinimal::class, Restaurant::class], version = 3)
+@Database(entities = [RestaurantMinimal::class, Restaurant::class], version = 5)
 @TypeConverters(Converters::class)
 abstract class LocalRestaurantDataStore : RoomDatabase() {
     abstract fun restaurantDao(): RestaurantDao
+    abstract fun restaurantMinimalDao(): RestaurantMinimalDao
 
     companion object {
         val DB_NAME = "restaurant-db"

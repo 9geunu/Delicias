@@ -20,4 +20,11 @@ abstract class RestaurantMinimalDao: BaseDao<RestaurantMinimal> {
         deleteAll()
         insertAll(restaurantMinimals)
     }
+
+    @Query("UPDATE restaurant_minimal SET isFavorite = :isFavorite WHERE id = :id")
+    protected abstract suspend fun updateIsFavoriteOfRestaurantMinimalById(isFavorite: Boolean, id: Long)
+
+    suspend fun updateRestaurantMinimalAsFavorite(id: Long) = updateIsFavoriteOfRestaurantMinimalById(true, id)
+
+    suspend fun updateRestaurantMinimalAsNotFavorite(id: Long) = updateIsFavoriteOfRestaurantMinimalById(false, id)
 }
