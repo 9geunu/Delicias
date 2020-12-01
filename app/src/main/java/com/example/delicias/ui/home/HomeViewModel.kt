@@ -41,4 +41,8 @@ class HomeViewModel(private val repository: RestaurantRepository) : ViewModel(){
     fun searchForDinner(query: String): LiveData<List<RestaurantMinimal>>{
         return repository.searchForDinner(query).asLiveData(Dispatchers.Default + viewModelScope.coroutineContext)
     }
+
+    fun getAllRestaurantMinimal(): LiveData<List<RestaurantMinimal>> {
+        return repository.getAllRestaurantMinimals().asLiveData(Dispatchers.Default + viewModelScope.coroutineContext)
+    }
 }

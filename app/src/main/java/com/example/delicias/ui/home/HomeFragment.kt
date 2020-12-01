@@ -1,8 +1,6 @@
 package com.example.delicias.ui.home
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +11,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -29,6 +26,7 @@ import com.example.delicias.ui.DateAdapter
 import com.example.delicias.ui.MealTimeAdapter
 import com.example.delicias.ui.RestaurantMinimalAdapter
 import com.example.delicias.util.Util
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
 class HomeFragment : Fragment(), SearchView.OnQueryTextListener {
@@ -39,6 +37,7 @@ class HomeFragment : Fragment(), SearchView.OnQueryTextListener {
     lateinit var binding: FragmentHomeBinding
     lateinit var lifecycleOwner: LifecycleOwner
     var currentMealTime = MealTime.BREAKFAST
+    lateinit var restaurantDataRepository :RestaurantDataRepository
 
     enum class MealTime{
         BREAKFAST,
@@ -54,8 +53,10 @@ class HomeFragment : Fragment(), SearchView.OnQueryTextListener {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
         lifecycleOwner = viewLifecycleOwner
         val restaurantDao = LocalRestaurantDataStore.getInstance(this.requireContext()).restaurantDao()
+        val restaurantMinimalDao = LocalRestaurantDataStore.getInstance(this.requireContext()).restaurantMinimalDao()
 
-        val factory = HomeViewModelFactory(RestaurantDataRepository(restaurantDao))
+        restaurantDataRepository = RestaurantDataRepository(restaurantDao, restaurantMinimalDao)
+        val factory = HomeViewModelFactory(restaurantDataRepository)
         homeViewModel = ViewModelProviders.of(this, factory).get(HomeViewModel::class.java)
 
         insertAll()
@@ -109,6 +110,10 @@ class HomeFragment : Fragment(), SearchView.OnQueryTextListener {
             }
         }
 
+        homeViewModel.getAllRestaurantMinimal().observe(lifecycleOwner, androidx.lifecycle.Observer {
+            restaurantMinimalAdapter.submitList(it)
+        })
+
         return binding.root
     }
 
@@ -118,21 +123,24 @@ class HomeFragment : Fragment(), SearchView.OnQueryTextListener {
              when (position) {
                 0 -> {
                     currentMealTime = MealTime.BREAKFAST
-                    homeViewModel.getAllBreakfast().observe(lifecycleOwner, androidx.lifecycle.Observer {
-                        restaurantMinimalAdapter.submitList(it)
-                    })
+                    runBlocking {
+                        val breakfastList = restaurantDataRepository.getAllBreakfast().first()
+                        restaurantDataRepository.updateRestaurantMinimals(breakfastList)
+                    }
                 }
                 1 -> {
                     currentMealTime = MealTime.LUNCH
-                    homeViewModel.getAllLunch().observe(lifecycleOwner, androidx.lifecycle.Observer {
-                        restaurantMinimalAdapter.submitList(it)
-                    })
+                    runBlocking {
+                        val lunchList = restaurantDataRepository.getAllLunch().first()
+                        restaurantDataRepository.updateRestaurantMinimals(lunchList)
+                    }
                 }
                 2 -> {
                     currentMealTime = MealTime.DINNER
-                    homeViewModel.getAllDinner().observe(lifecycleOwner, androidx.lifecycle.Observer {
-                        restaurantMinimalAdapter.submitList(it)
-                    })
+                    runBlocking {
+                        val dinnerList = restaurantDataRepository.getAllDinner().first()
+                        restaurantDataRepository.updateRestaurantMinimals(dinnerList)
+                    }
                 }
                 else -> error("no such position: $position")
             }
@@ -164,22 +172,22 @@ class HomeFragment : Fragment(), SearchView.OnQueryTextListener {
 
         when (currentMealTime){
             MealTime.BREAKFAST -> {
-                homeViewModel.searchForBreakfast(queryText).observe(lifecycleOwner, Observer {
-                    if (it != null)
-                        restaurantMinimalAdapter.submitList(it)
-                })
+                runBlocking {
+                    val searchedBreakfastList = restaurantDataRepository.searchForBreakfast(queryText).first()
+                    restaurantDataRepository.updateRestaurantMinimals(searchedBreakfastList)
+                }
             }
             MealTime.LUNCH -> {
-                homeViewModel.searchForLunch(queryText).observe(lifecycleOwner, Observer {
-                    if (it != null)
-                        restaurantMinimalAdapter.submitList(it)
-                })
+                runBlocking {
+                    val searchedLunchList = restaurantDataRepository.searchForLunch(queryText).first()
+                    restaurantDataRepository.updateRestaurantMinimals(searchedLunchList)
+                }
             }
             MealTime.DINNER -> {
-                homeViewModel.searchForDinner(queryText).observe(lifecycleOwner, Observer {
-                    if (it != null)
-                        restaurantMinimalAdapter.submitList(it)
-                })
+                runBlocking {
+                    val searchedDinnerList = restaurantDataRepository.searchForDinner(queryText).first()
+                    restaurantDataRepository.updateRestaurantMinimals(searchedDinnerList)
+                }
             }
         }
     }
