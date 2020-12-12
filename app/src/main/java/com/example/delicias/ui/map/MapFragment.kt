@@ -1,5 +1,6 @@
 package com.example.delicias.ui.map
 
+import android.animation.ValueAnimator
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -19,6 +20,7 @@ import com.example.delicias.R
 import com.example.delicias.data.repository.RestaurantDataRepository
 import com.example.delicias.data.repository.datasource.LocalRestaurantDataStore
 import com.example.delicias.databinding.FragmentMapBinding
+import com.example.delicias.ui.AnimationOnClickListener
 import com.example.delicias.ui.MenuAdapter
 import com.example.delicias.ui.RestaurantSearchAdapter
 import com.naver.maps.geometry.LatLng
@@ -47,6 +49,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, SearchView.OnQueryTextListen
     private val pinImage = OverlayImage.fromResource(R.drawable.pin)
     private val pinDetailImage = OverlayImage.fromResource(R.drawable.pin_detail)
     private var markers = mutableListOf<Marker>()
+    private lateinit var animatorListener: AnimationOnClickListener
     private val listener = Overlay.OnClickListener { overlay ->
         val marker = overlay as Marker
         Log.d("delitag", "setMarkers: ${marker.tag} 클릭됨")
@@ -57,14 +60,18 @@ class MapFragment : Fragment(), OnMapReadyCallback, SearchView.OnQueryTextListen
             binding.rvMenuItem.adapter = MenuAdapter(restaurant.lunch.menus)
             MenuAdapter(restaurant.lunch.menus)
         }
-        if (mapViewModel.isMapFullSize()) {
-            if (binding.cvRestaurantInfo.isVisible) {
-                mapViewModel.setRestaurantInfoInVisible()
-                marker.icon = pinImage
-            } else {
-                mapViewModel.setRestaurantInfoVisible()
-                marker.icon = pinDetailImage
-            }
+        if (binding.cvRestaurantInfo.isVisible) {
+            mapViewModel.setRestaurantInfoInVisible()
+            marker.icon = pinImage
+        }
+        mapViewModel.setRestaurantInfoVisible()
+
+        marker.icon = pinDetailImage
+
+        markers.filter { otherMarker ->
+            otherMarker.tag != marker.tag && otherMarker.icon == pinDetailImage
+        }.forEach { otherMarker ->
+            otherMarker.icon = pinImage
         }
         true
     }
@@ -119,11 +126,15 @@ class MapFragment : Fragment(), OnMapReadyCallback, SearchView.OnQueryTextListen
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int,
-                                            permissions: Array<String>,
-                                            grantResults: IntArray) {
-        if (locationSource.onRequestPermissionsResult(requestCode, permissions,
-                grantResults)) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        if (locationSource.onRequestPermissionsResult(
+                requestCode, permissions,
+                grantResults
+            )) {
             if (!locationSource.isActivated) { // 권한 거부됨
                 naverMap.locationTrackingMode = LocationTrackingMode.None
             }
@@ -140,12 +151,22 @@ class MapFragment : Fragment(), OnMapReadyCallback, SearchView.OnQueryTextListen
         this.naverMap.minZoom = 13.9
         this.naverMap.maxZoom = 19.0
         this.naverMap.isIndoorEnabled = true
-        this.naverMap.extent = LatLngBounds(LatLng(37.446082, 126.947008), LatLng(37.469290, 126.962146))
+        this.naverMap.extent = LatLngBounds(
+            LatLng(37.446082, 126.947008), LatLng(
+                37.469290,
+                126.962146
+            )
+        )
         val uiSettings = this.naverMap.uiSettings
         uiSettings.isLocationButtonEnabled = false
         uiSettings.isZoomControlEnabled = false
 
         restaurantSearchAdapter = RestaurantSearchAdapter(naverMap, mapViewModel)
+
+        animatorListener = AnimationOnClickListener(requireContext(), binding.clRestaurantInfo, binding.map, naverMap)
+        binding.clRestaurantInfo.setOnClickListener(
+            animatorListener
+        )
 
         binding.rvSearchRestaurantList.layoutManager = LinearLayoutManager(this.requireContext())
         binding.rvSearchRestaurantList.itemAnimator = DefaultItemAnimator()
@@ -193,9 +214,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, SearchView.OnQueryTextListen
             if (mapViewModel.mapSizePercentage.value == 40F)
                 mapViewModel.setRestaurantDetailInfoInvisible()
 
-            if (binding.cvNmapDeeplink.isVisible)
-                mapViewModel.setNMapAppDeeplinkCardViewInvisible()
-
             onCloseListener.onClose()
 
             markers.filter { marker ->
@@ -203,6 +221,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, SearchView.OnQueryTextListen
             }.forEach { marker ->
                 marker.icon = pinImage
             }
+
+            animatorListener.onMapClick()
         }
     }
 
@@ -217,14 +237,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, SearchView.OnQueryTextListen
             marker.icon = pinImage
         }
 
+        animatorListener.onMapClick()
+
         return if (binding.cvRestaurantInfo.isVisible) {
             mapViewModel.setRestaurantInfoInVisible()
             false
         } else if (mapViewModel.mapSizePercentage.value == 40F) {
             mapViewModel.setRestaurantDetailInfoInvisible()
-            false
-        } else if (binding.cvNmapDeeplink.isVisible) {
-            mapViewModel.setNMapAppDeeplinkCardViewInvisible()
             false
         } else true
     }

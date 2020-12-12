@@ -16,6 +16,128 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+        <LinearLayout
+            android:id="@+id/ll_detail_restaurant_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#e9ecef"
+            android:layout_gravity="bottom">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#ffffff"
+                android:layout_marginBottom="1dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp">
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toBottomOf="parent"
+                        app:layout_constraintBottom_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        android:layout_marginLeft="30dp"
+                        android:text="위치"
+                        android:textSize="18sp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toBottomOf="parent"
+                        app:layout_constraintBottom_toTopOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        android:layout_marginRight="30dp"
+                        android:text="@{restaurant.place}"
+                        android:textSize="18sp"/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#ffffff"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp">
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <ImageView
+                        android:id="@+id/iv_clock"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/clock"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        android:layout_marginLeft="10dp"/>
+                    <TextView
+                        android:id="@+id/tv_open_time_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="@+id/iv_clock"
+                        app:layout_constraintLeft_toRightOf="@+id/iv_clock"
+                        android:layout_marginLeft="10dp"
+                        android:text="운영시간"
+                        android:textSize="18sp"/>
+                    <TextView
+                        android:id="@+id/tv_open_time_detail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toBottomOf="@id/iv_clock"
+                        app:layout_constraintLeft_toLeftOf="@id/iv_clock"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginTop="10dp"
+                        android:textSize="14sp"
+                        android:text="@{restaurant.lunchTime}"/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#ffffff"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp">
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/tv_cafeteria_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginTop="8dp"
+                        android:text="오늘의 메뉴"
+                        android:textColor="#000000"
+                        android:textSize="18sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <LinearLayout
+                        android:id="@+id/ll_division"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="40dp"
+                        android:background="#e9ecef"
+                        android:orientation="horizontal"
+                        app:layout_constraintTop_toTopOf="parent"/>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_menu_item"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="@id/ll_division"
+                        tools:layout_editor_absoluteX="0dp"
+                        tools:listitem="@layout/item_menu" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -70,130 +192,7 @@
                 android:layout_height="match_parent"
                 app:navermap_latitude="37.450050"
                 app:navermap_longitude="126.952497"
-                app:navermap_zoom="16"
-                linear_layout_weight="@{100F - viewModel.mapSizePercentage}"/>
-
-            <LinearLayout
-                android:id="@+id/ll_detail_restaurant_info"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:background="#e9ecef"
-                linear_layout_weight="@{viewModel.mapSizePercentage}">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="#ffffff"
-                    android:layout_marginBottom="1dp"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp">
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:layout_constraintTop_toBottomOf="parent"
-                            app:layout_constraintBottom_toTopOf="parent"
-                            app:layout_constraintLeft_toLeftOf="parent"
-                            android:layout_marginLeft="30dp"
-                            android:text="위치"
-                            android:textSize="18sp"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:layout_constraintTop_toBottomOf="parent"
-                            app:layout_constraintBottom_toTopOf="parent"
-                            app:layout_constraintRight_toRightOf="parent"
-                            android:layout_marginRight="30dp"
-                            android:text="@{restaurant.place}"
-                            android:textSize="18sp"/>
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="#ffffff"
-                    android:paddingTop="15dp"
-                    android:paddingBottom="15dp">
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                        <ImageView
-                            android:id="@+id/iv_clock"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:src="@drawable/clock"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintLeft_toLeftOf="parent"
-                            android:layout_marginLeft="10dp"/>
-                        <TextView
-                            android:id="@+id/tv_open_time_title"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:layout_constraintTop_toTopOf="@+id/iv_clock"
-                            app:layout_constraintLeft_toRightOf="@+id/iv_clock"
-                            android:layout_marginLeft="10dp"
-                            android:text="운영시간"
-                            android:textSize="18sp"/>
-                        <TextView
-                            android:id="@+id/tv_open_time_detail"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:layout_constraintTop_toBottomOf="@id/iv_clock"
-                            app:layout_constraintLeft_toLeftOf="@id/iv_clock"
-                            android:layout_marginLeft="5dp"
-                            android:layout_marginTop="10dp"
-                            android:textSize="14sp"
-                            android:text="@{restaurant.lunchTime}"/>
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="#ffffff"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp">
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <TextView
-                            android:id="@+id/tv_cafeteria_name"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="16dp"
-                            android:layout_marginLeft="16dp"
-                            android:layout_marginTop="8dp"
-                            android:text="오늘의 메뉴"
-                            android:textColor="#000000"
-                            android:textSize="18sp"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <LinearLayout
-                            android:id="@+id/ll_division"
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:layout_marginTop="40dp"
-                            android:background="#e9ecef"
-                            android:orientation="horizontal"
-                            app:layout_constraintTop_toTopOf="parent"/>
-
-                        <androidx.recyclerview.widget.RecyclerView
-                            android:id="@+id/rv_menu_item"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            app:layout_constraintTop_toTopOf="@id/ll_division"
-                            tools:layout_editor_absoluteX="0dp"
-                            tools:listitem="@layout/item_menu" />
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-                </LinearLayout>
-            </LinearLayout>
-
+                app:navermap_zoom="16"/>
         </LinearLayout>
 
         <androidx.cardview.widget.CardView
@@ -208,9 +207,9 @@
             visible="@{viewModel.isRestaurantInfoCardViewVisible}">
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl_restaurant_info"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:onClick="@{() -> viewModel.onRestaurantInfoClicked()}">
+                android:layout_height="match_parent">
 
                 <TextView
                     android:id="@+id/tv_card_restaurant_title"
@@ -325,7 +324,7 @@
 
                     <LinearLayout
                         android:id="@+id/ln_find_road"
-                        android:onClick="@{() -> viewModel.setNMapAppDeeplinkCardViewVisible()}"
+                        android:onClick="@{() -> viewModel.setNMapAppDeeplinkCardViewVisible(restaurant)}"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="horizontal"
@@ -346,63 +345,5 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cv_nmap_deeplink"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="10dp"
-            app:cardElevation="20dp"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
-            android:layout_gravity="center"
-            visible="@{viewModel.isNMapAppDeeplinkCardViewVisible}">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="80dp"
-                    android:background="@drawable/shape_boarder"
-                    android:gravity="center">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="네이버 지도로 이동합니다."/>
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-                    <LinearLayout
-                        android:onClick="@{() -> viewModel.onFindRoadOkButtonClick(restaurant)}"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        android:gravity="center"
-                        android:layout_weight="50"
-                        android:background="@drawable/shape_boarder">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="확인"/>
-                    </LinearLayout>
-                    <LinearLayout
-                        android:onClick="@{() -> viewModel.onFindRoadCancelButtonClicked()}"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        android:gravity="center"
-                        android:layout_weight="50"
-                        android:background="@drawable/shape_boarder">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="취소"/>
-                    </LinearLayout>
-                </LinearLayout>
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
-
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>
