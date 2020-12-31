@@ -7,6 +7,7 @@ import com.example.delicias.data.repository.datasource.RestaurantMinimalDao
 import com.example.delicias.domain.RestaurantMinimal
 import com.example.delicias.domain.repository.RestaurantRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import java.lang.Exception
 
 class RestaurantDataRepository(
@@ -49,16 +50,8 @@ class RestaurantDataRepository(
         restaurantMinimalDao.updateRestaurantMinimals(restaurantMinimals)
     }
 
-    override fun getAllBreakfast(): Flow<List<RestaurantMinimal>> {
-        return restaurantDao.getAllBreakfast()
-    }
-
-    override fun getAllLunch(): Flow<List<RestaurantMinimal>> {
-        return restaurantDao.getAllLunch()
-    }
-
-    override fun getAllDinner(): Flow<List<RestaurantMinimal>> {
-        return restaurantDao.getAllDinner()
+    override suspend fun updateDistanceOrderOfRestaurantById(id: Long, distanceOrder: Int) {
+        restaurantDao.updateDistanceOrderOfRestaurantById(id, distanceOrder)
     }
 
     override fun getAllFavoriteBreakfast(): Flow<List<RestaurantMinimal>> {
@@ -87,5 +80,28 @@ class RestaurantDataRepository(
 
     override fun searchRestaurant(searchquery: String): Flow<List<Restaurant>> {
         return restaurantDao.searchRestaurant(searchquery)
+    }
+
+    override fun getRestaurantMinimalOrderByName(): Flow<List<RestaurantMinimal>> {
+        return restaurantMinimalDao.getRestaurantMinimalOrderByName()
+    }
+
+    override fun getRestaurantMinimalOrderByDistance(): Flow<List<RestaurantMinimal>> {
+        return restaurantMinimalDao.getRestaurantMinimalOrderByDistance()
+    }
+
+    override suspend fun updateBreakfast() {
+        val breakfastList = restaurantDao.getAllBreakfast().first()
+        restaurantMinimalDao.updateRestaurantMinimals(breakfastList)
+    }
+
+    override suspend fun updateLunch() {
+        val lunchList = restaurantDao.getAllLunch().first()
+        restaurantMinimalDao.updateRestaurantMinimals(lunchList)
+    }
+
+    override suspend fun updateDinner() {
+        val dinnerList = restaurantDao.getAllDinner().first()
+        restaurantMinimalDao.updateRestaurantMinimals(dinnerList)
     }
 }

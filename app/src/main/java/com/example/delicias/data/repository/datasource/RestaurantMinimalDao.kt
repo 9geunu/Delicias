@@ -12,6 +12,12 @@ abstract class RestaurantMinimalDao: BaseDao<RestaurantMinimal> {
     @Query("SELECT * FROM restaurant_minimal")
     abstract fun getRestaurantMinimals(): Flow<List<RestaurantMinimal>>
 
+    @Query("SELECT * FROM restaurant_minimal ORDER BY name")
+    abstract fun getRestaurantMinimalOrderByName(): Flow<List<RestaurantMinimal>>
+
+    @Query("SELECT * FROM restaurant_minimal ORDER BY distanceOrder")
+    abstract fun getRestaurantMinimalOrderByDistance(): Flow<List<RestaurantMinimal>>
+
     @Query("DELETE  FROM restaurant_minimal")
     abstract suspend fun deleteAll()
 

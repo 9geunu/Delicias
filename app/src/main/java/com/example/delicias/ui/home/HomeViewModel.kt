@@ -18,31 +18,35 @@ class HomeViewModel(private val repository: RestaurantRepository) : ViewModel(){
         }
     }
 
-    fun getAllBreakfast(): LiveData<List<RestaurantMinimal>> {
-        return repository.getAllBreakfast().asLiveData(Dispatchers.Default + viewModelScope.coroutineContext)
+    suspend fun updateBreakfast() {
+        repository.updateBreakfast()
     }
 
-    fun getAllLunch(): LiveData<List<RestaurantMinimal>> {
-        return repository.getAllLunch().asLiveData(Dispatchers.Default + viewModelScope.coroutineContext)
+    suspend fun updateLunch() {
+        repository.updateLunch()
     }
 
-    fun getAllDinner(): LiveData<List<RestaurantMinimal>> {
-        return repository.getAllDinner().asLiveData(Dispatchers.Default + viewModelScope.coroutineContext)
+    suspend fun updateDinner() {
+        repository.updateDinner()
     }
 
     fun searchForBreakfast(query: String): LiveData<List<RestaurantMinimal>>{
-        return repository.searchForBreakfast(query).asLiveData(Dispatchers.Default + viewModelScope.coroutineContext)
+        return repository.searchForBreakfast(query).asLiveData(viewModelScope.coroutineContext)
     }
 
     fun searchForLunch(query: String): LiveData<List<RestaurantMinimal>>{
-        return repository.searchForLunch(query).asLiveData(Dispatchers.Default + viewModelScope.coroutineContext)
+        return repository.searchForLunch(query).asLiveData(viewModelScope.coroutineContext)
     }
 
     fun searchForDinner(query: String): LiveData<List<RestaurantMinimal>>{
-        return repository.searchForDinner(query).asLiveData(Dispatchers.Default + viewModelScope.coroutineContext)
+        return repository.searchForDinner(query).asLiveData(viewModelScope.coroutineContext)
     }
 
-    fun getAllRestaurantMinimal(): LiveData<List<RestaurantMinimal>> {
-        return repository.getAllRestaurantMinimals().asLiveData(Dispatchers.Default + viewModelScope.coroutineContext)
+    fun getRestaurantMinimalOrderByName(): LiveData<List<RestaurantMinimal>> {
+        return repository.getRestaurantMinimalOrderByName().asLiveData(viewModelScope.coroutineContext)
+    }
+
+    fun getRestaurantMinimalOrderByDistance(): LiveData<List<RestaurantMinimal>> {
+        return repository.getRestaurantMinimalOrderByDistance().asLiveData(viewModelScope.coroutineContext)
     }
 }

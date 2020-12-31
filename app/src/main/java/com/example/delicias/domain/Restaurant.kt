@@ -34,5 +34,6 @@ data class Restaurant(
     val latitude: Double,
     @SerializedName("longitude")
     val longitude: Double,
-    var isFavorite: Boolean
+    var isFavorite: Boolean,
+    var distanceOrder: Int = 0
 )

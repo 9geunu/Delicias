@@ -13,9 +13,7 @@ interface RestaurantRepository {
     suspend fun deleteRestaurant(restaurant: Restaurant)
     suspend fun deleteAllRestaurant()
     suspend fun updateRestaurantMinimals(restaurantMinimals: List<RestaurantMinimal>)
-    fun getAllBreakfast(): Flow<List<RestaurantMinimal>>
-    fun getAllLunch(): Flow<List<RestaurantMinimal>>
-    fun getAllDinner(): Flow<List<RestaurantMinimal>>
+    suspend fun updateDistanceOrderOfRestaurantById(id: Long, distanceOrder: Int)
     fun getAllFavoriteBreakfast(): Flow<List<RestaurantMinimal>>
     fun getAllFavoriteLunch(): Flow<List<RestaurantMinimal>>
     fun getAllFavoriteDinner(): Flow<List<RestaurantMinimal>>
@@ -23,4 +21,9 @@ interface RestaurantRepository {
     fun searchForLunch(searchquery: String): Flow<List<RestaurantMinimal>>
     fun searchForDinner(searchquery: String): Flow<List<RestaurantMinimal>>
     fun searchRestaurant(searchquery: String): Flow<List<Restaurant>>
+    fun getRestaurantMinimalOrderByName(): Flow<List<RestaurantMinimal>>
+    fun getRestaurantMinimalOrderByDistance(): Flow<List<RestaurantMinimal>>
+    suspend fun updateBreakfast()
+    suspend fun updateLunch()
+    suspend fun updateDinner()
 }

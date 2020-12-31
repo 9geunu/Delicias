@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.flow
 import java.lang.Math.pow
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.pow
 import kotlin.math.sqrt
 
 
@@ -151,7 +152,7 @@ class Util {
         }
 
         fun calculateRestaurantDistance(currentLocation: Location?, restaurantLat: Double, restaurantLng: Double): Double {
-            return sqrt(pow(currentLocation?.latitude?.minus(restaurantLat)!!, 2.0) + pow(currentLocation.longitude.minus(restaurantLng), 2.0))
+            return sqrt((currentLocation?.latitude?.minus(restaurantLat)!!).pow(2.0) + currentLocation.longitude.minus(restaurantLng).pow(2.0))
         }
     }
 }
