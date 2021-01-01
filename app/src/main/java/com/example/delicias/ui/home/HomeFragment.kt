@@ -1,5 +1,6 @@
 package com.example.delicias.ui.home
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -19,6 +20,7 @@ import com.example.delicias.data.repository.RestaurantDataRepository
 import com.example.delicias.data.repository.datasource.LocalRestaurantDataStore
 import com.example.delicias.databinding.FragmentHomeBinding
 import com.example.delicias.domain.Date
+import com.example.delicias.domain.MealTime
 import com.example.delicias.domain.RestaurantMinimal
 import com.example.delicias.ui.DateAdapter
 import com.example.delicias.ui.MealTimeAdapter
@@ -40,12 +42,6 @@ class HomeFragment : Fragment(), SearchView.OnQueryTextListener {
     lateinit var restaurantDataRepository :RestaurantDataRepository
     val scope = CoroutineScope(Dispatchers.Default)
     val spinnerItemLiveData = MutableLiveData<Int>(0)
-
-    enum class MealTime{
-        BREAKFAST,
-        LUNCH,
-        DINNER
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -100,20 +96,9 @@ class HomeFragment : Fragment(), SearchView.OnQueryTextListener {
                 id: Long
             ) {
                 if (position == 1){
-                    Log.d("delitag", "onItemSelected: 11")
                     runBlocking {
-                        sortByLocation()
-                        when (currentMealTime){
-                            MealTime.BREAKFAST -> {
-                                homeViewModel.updateBreakfast()
-                            }
-                            MealTime.LUNCH -> {
-                                homeViewModel.updateLunch()
-                            }
-                            MealTime.DINNER -> {
-                                homeViewModel.updateDinner()
-                            }
-                        }
+                        Util.sortByLocation(requireContext(), restaurantDataRepository)
+                        refresh()
                         spinnerItemLiveData.postValue(position)
                     }
                 }
@@ -126,15 +111,19 @@ class HomeFragment : Fragment(), SearchView.OnQueryTextListener {
             }
         }
 
+        binding.srlRefresh.setOnRefreshListener {
+            binding.srlRefresh.isRefreshing = true
+            runBlocking {
+                refresh()
+                binding.srlRefresh.isRefreshing = false
+            }
+        }
+
         restaurantMinimalLiveData = Transformations.switchMap(spinnerItemLiveData) {
             when(it) {
-                0 -> {
-                    homeViewModel.getRestaurantMinimalOrderByName()
-                }
-                1 -> {
-                    homeViewModel.getRestaurantMinimalOrderByDistance()
-                }
-                else -> error("No Such Position${it}")
+                0 -> homeViewModel.getRestaurantMinimalOrderByName()
+                1 -> homeViewModel.getRestaurantMinimalOrderByDistance()
+                else -> error("No Such Position $it")
             }
         }
 
@@ -145,6 +134,20 @@ class HomeFragment : Fragment(), SearchView.OnQueryTextListener {
             })
 
         return binding.root
+    }
+
+    suspend fun refresh() {
+        when (currentMealTime) {
+            MealTime.BREAKFAST -> {
+                homeViewModel.updateBreakfast()
+            }
+            MealTime.LUNCH -> {
+                homeViewModel.updateLunch()
+            }
+            MealTime.DINNER -> {
+                homeViewModel.updateDinner()
+            }
+        }
     }
 
     private inner class PageChangeCallback: ViewPager2.OnPageChangeCallback() {
@@ -219,28 +222,5 @@ class HomeFragment : Fragment(), SearchView.OnQueryTextListener {
         }
     }
 
-    private suspend fun sortByLocation() {
-        var restaurants = restaurantDataRepository.getAllRestaurants().first()
 
-        Collections.sort(restaurants, kotlin.Comparator { left, right ->
-            val currentLocation = Util.getLocation(requireContext())
-
-            if (Util.calculateRestaurantDistance
-                    (currentLocation, left.latitude, left.longitude) >
-                Util.calculateRestaurantDistance
-                    (currentLocation, right.latitude, right.longitude))
-                return@Comparator 1
-            else if (Util.calculateRestaurantDistance
-                    (currentLocation, left.latitude, left.longitude) <
-                Util.calculateRestaurantDistance
-                    (currentLocation, right.latitude, right.longitude))
-                return@Comparator -1
-            else return@Comparator 0
-        })
-
-        val restaurantIterator = restaurants.iterator()
-        for ((index , value) in restaurantIterator.withIndex()) {
-            restaurantDataRepository.updateDistanceOrderOfRestaurantById(value.id, index + 1)
-        }
-    }
 }
