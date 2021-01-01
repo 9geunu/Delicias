@@ -8,6 +8,7 @@ import com.example.delicias.domain.Date
 import com.example.delicias.domain.RestaurantMinimal
 import com.example.delicias.domain.repository.RestaurantRepository
 import com.example.delicias.util.Util
+import kotlinx.coroutines.flow.Flow
 
 class FavoritesViewModel(private val repository: RestaurantRepository) : ViewModel() {
     private var _dateLiveData = Util.getDates().asLiveData(viewModelScope.coroutineContext)
@@ -27,7 +28,23 @@ class FavoritesViewModel(private val repository: RestaurantRepository) : ViewMod
         return repository.getAllFavoriteDinner().asLiveData(viewModelScope.coroutineContext)
     }
 
-    fun getAllRestaurantMinimal(): LiveData<List<RestaurantMinimal>> {
-        return repository.getAllRestaurantMinimals().asLiveData(viewModelScope.coroutineContext)
+    suspend fun updateBreakfast() {
+        repository.updateBreakfast()
+    }
+
+    suspend fun updateLunch() {
+        repository.updateLunch()
+    }
+
+    suspend fun updateDinner() {
+        repository.updateDinner()
+    }
+
+    fun getFavoriteRestaurantMinimalOrderByName(): LiveData<List<RestaurantMinimal>> {
+        return repository.getFavoriteRestaurantMinimalOrderByName().asLiveData(viewModelScope.coroutineContext)
+    }
+
+    fun getFavoriteRestaurantMinimalOrderByDistance(): LiveData<List<RestaurantMinimal>> {
+        return repository.getFavoriteRestaurantMinimalOrderByDistance().asLiveData(viewModelScope.coroutineContext)
     }
 }

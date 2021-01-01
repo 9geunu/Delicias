@@ -90,6 +90,14 @@ class RestaurantDataRepository(
         return restaurantMinimalDao.getRestaurantMinimalOrderByDistance()
     }
 
+    override fun getFavoriteRestaurantMinimalOrderByName(): Flow<List<RestaurantMinimal>> {
+        return restaurantMinimalDao.getFavoriteRestaurantMinimalOrderByName()
+    }
+
+    override fun getFavoriteRestaurantMinimalOrderByDistance(): Flow<List<RestaurantMinimal>> {
+        return restaurantMinimalDao.getFavoriteRestaurantMinimalOrderByDistance()
+    }
+
     override suspend fun updateBreakfast() {
         val breakfastList = restaurantDao.getAllBreakfast().first()
         restaurantMinimalDao.updateRestaurantMinimals(breakfastList)

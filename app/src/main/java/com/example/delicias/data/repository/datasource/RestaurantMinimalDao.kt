@@ -18,6 +18,12 @@ abstract class RestaurantMinimalDao: BaseDao<RestaurantMinimal> {
     @Query("SELECT * FROM restaurant_minimal ORDER BY distanceOrder")
     abstract fun getRestaurantMinimalOrderByDistance(): Flow<List<RestaurantMinimal>>
 
+    @Query("SELECT * FROM restaurant_minimal WHERE isFavorite = 1 ORDER BY name")
+    abstract fun getFavoriteRestaurantMinimalOrderByName(): Flow<List<RestaurantMinimal>>
+
+    @Query("SELECT * FROM restaurant_minimal WHERE isFavorite = 1 ORDER BY distanceOrder")
+    abstract fun getFavoriteRestaurantMinimalOrderByDistance(): Flow<List<RestaurantMinimal>>
+
     @Query("DELETE  FROM restaurant_minimal")
     abstract suspend fun deleteAll()
 

@@ -23,6 +23,8 @@ interface RestaurantRepository {
     fun searchRestaurant(searchquery: String): Flow<List<Restaurant>>
     fun getRestaurantMinimalOrderByName(): Flow<List<RestaurantMinimal>>
     fun getRestaurantMinimalOrderByDistance(): Flow<List<RestaurantMinimal>>
+    fun getFavoriteRestaurantMinimalOrderByName(): Flow<List<RestaurantMinimal>>
+    fun getFavoriteRestaurantMinimalOrderByDistance(): Flow<List<RestaurantMinimal>>
     suspend fun updateBreakfast()
     suspend fun updateLunch()
     suspend fun updateDinner()

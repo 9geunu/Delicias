@@ -1,6 +1,7 @@
 package com.example.delicias.ui.favorites
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,10 +9,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelProviders
-import androidx.lifecycle.asLiveData
+import androidx.lifecycle.*
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
@@ -20,10 +18,16 @@ import com.example.delicias.data.repository.RestaurantDataRepository
 import com.example.delicias.data.repository.datasource.LocalRestaurantDataStore
 import com.example.delicias.databinding.FragmentFavoritesBinding
 import com.example.delicias.domain.Date
+import com.example.delicias.domain.MealTime
+import com.example.delicias.domain.RestaurantMinimal
 import com.example.delicias.ui.DateAdapter
 import com.example.delicias.ui.MealTimeAdapter
 import com.example.delicias.ui.RestaurantMinimalAdapter
 import com.example.delicias.util.Util
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.first
+import java.util.*
+import kotlin.collections.ArrayList
 
 class FavoritesFragment : Fragment() {
     lateinit var favoritesViewModel: FavoritesViewModel
@@ -32,6 +36,10 @@ class FavoritesFragment : Fragment() {
     lateinit var restaurantMinimalAdapter: RestaurantMinimalAdapter
     lateinit var lifecycleOwner: LifecycleOwner
     lateinit var restaurantDataRepository :RestaurantDataRepository
+    var currentMealTime = MealTime.BREAKFAST
+    lateinit var restaurantMinimalLiveData: LiveData<List<RestaurantMinimal>>
+    val scope = CoroutineScope(Dispatchers.Default)
+    val spinnerItemLiveData = MutableLiveData<Int>(0)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -77,12 +85,15 @@ class FavoritesFragment : Fragment() {
                 position: Int,
                 id: Long
             ) {
-                when(position){
-                    0 -> {
-                    }
-                    1 -> {
+                if (position == 1){
+                    runBlocking {
+                        Util.sortByLocation(requireContext(), restaurantDataRepository)
+                        refresh()
+                        spinnerItemLiveData.postValue(position)
                     }
                 }
+                else
+                    spinnerItemLiveData.postValue(position)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -90,7 +101,43 @@ class FavoritesFragment : Fragment() {
             }
         }
 
+        binding.srlRefresh.setOnRefreshListener {
+            binding.srlRefresh.isRefreshing = true
+            runBlocking {
+                refresh()
+                binding.srlRefresh.isRefreshing = false
+            }
+        }
+
+        restaurantMinimalLiveData = Transformations.switchMap(spinnerItemLiveData) {
+            when (it) {
+                0 -> favoritesViewModel.getFavoriteRestaurantMinimalOrderByName()
+                1 -> favoritesViewModel.getFavoriteRestaurantMinimalOrderByDistance()
+                else -> error("No Such Position $it")
+            }
+        }
+
+        restaurantMinimalLiveData.observe(
+            lifecycleOwner,
+            androidx.lifecycle.Observer {
+                restaurantMinimalAdapter.submitList(it)
+            })
+
         return binding.root
+    }
+
+    suspend fun refresh() {
+        when (currentMealTime) {
+            MealTime.BREAKFAST -> {
+                favoritesViewModel.updateBreakfast()
+            }
+            MealTime.LUNCH -> {
+                favoritesViewModel.updateLunch()
+            }
+            MealTime.DINNER -> {
+                favoritesViewModel.updateDinner()
+            }
+        }
     }
 
     private inner class PageChangeCallback: ViewPager2.OnPageChangeCallback() {
@@ -98,19 +145,22 @@ class FavoritesFragment : Fragment() {
             super.onPageSelected(position)
             when (position) {
                 0 -> {
-                    favoritesViewModel.getAllFavoriteBreakfast().observe(lifecycleOwner, androidx.lifecycle.Observer {
-                        restaurantMinimalAdapter.submitList(it)
-                    })
+                    currentMealTime = MealTime.BREAKFAST
+                    scope.launch {
+                        favoritesViewModel.updateBreakfast()
+                    }
                 }
                 1 -> {
-                    favoritesViewModel.getAllFavoriteLunch().observe(lifecycleOwner, androidx.lifecycle.Observer {
-                        restaurantMinimalAdapter.submitList(it)
-                    })
+                    currentMealTime = MealTime.LUNCH
+                    scope.launch {
+                        favoritesViewModel.updateLunch()
+                    }
                 }
                 2 -> {
-                    favoritesViewModel.getAllFavoriteDinner().observe(lifecycleOwner, androidx.lifecycle.Observer {
-                        restaurantMinimalAdapter.submitList(it)
-                    })
+                    currentMealTime = MealTime.DINNER
+                    scope.launch {
+                        favoritesViewModel.updateDinner()
+                    }
                 }
                 else -> error("no such position: $position")
             }
