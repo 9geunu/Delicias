@@ -12,7 +12,9 @@ import android.util.Log
 import androidx.core.content.ContextCompat
 import com.example.delicias.domain.Date
 import com.example.delicias.domain.RestaurantMinimal
+import com.example.delicias.domain.repository.RestaurantRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import java.lang.Math.pow
 import java.util.*
@@ -85,14 +87,29 @@ class Util {
             return dateString
         }
 
-        fun sortByName(list: List<RestaurantMinimal>){
-            Collections.sort(list, kotlin.Comparator { left, right ->
-                if (left.name.first() > right.name.first())
+        suspend fun sortByLocation(context: Context, repository: RestaurantRepository) {
+            var restaurants = repository.getAllRestaurants().first()
+
+            Collections.sort(restaurants, kotlin.Comparator { left, right ->
+                val currentLocation = getLocation(context)
+
+                if (Util.calculateRestaurantDistance
+                        (currentLocation, left.latitude, left.longitude) >
+                    Util.calculateRestaurantDistance
+                        (currentLocation, right.latitude, right.longitude))
                     return@Comparator 1
-                else if (left.name.first() < right.name.first())
+                else if (Util.calculateRestaurantDistance
+                        (currentLocation, left.latitude, left.longitude) <
+                    Util.calculateRestaurantDistance
+                        (currentLocation, right.latitude, right.longitude))
                     return@Comparator -1
                 else return@Comparator 0
             })
+
+            val restaurantIterator = restaurants.iterator()
+            for ((index , value) in restaurantIterator.withIndex()) {
+                repository.updateDistanceOrderOfRestaurantById(value.id, index + 1)
+            }
         }
 
         fun getLocation(context: Context): Location? {
