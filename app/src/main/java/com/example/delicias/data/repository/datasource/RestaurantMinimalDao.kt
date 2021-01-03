@@ -12,16 +12,16 @@ abstract class RestaurantMinimalDao: BaseDao<RestaurantMinimal> {
     @Query("SELECT * FROM restaurant_minimal")
     abstract fun getRestaurantMinimals(): Flow<List<RestaurantMinimal>>
 
-    @Query("SELECT * FROM restaurant_minimal ORDER BY name")
+    @Query("SELECT * FROM restaurant_minimal WHERE restaurant_minimal.menus IS NOT NULL ORDER BY name")
     abstract fun getRestaurantMinimalOrderByName(): Flow<List<RestaurantMinimal>>
 
-    @Query("SELECT * FROM restaurant_minimal ORDER BY distanceOrder")
+    @Query("SELECT m.* FROM restaurant_minimal AS m INNER JOIN restaurant ON m.id = restaurant.id WHERE m.menus IS NOT NULL ORDER BY restaurant.distanceOrder")
     abstract fun getRestaurantMinimalOrderByDistance(): Flow<List<RestaurantMinimal>>
 
-    @Query("SELECT * FROM restaurant_minimal WHERE isFavorite = 1 ORDER BY name")
+    @Query("SELECT m.* FROM restaurant_minimal AS m INNER JOIN restaurant ON m.id = restaurant.id WHERE m.menus IS NOT NULL AND restaurant.isFavorite = 1 ORDER BY m.name")
     abstract fun getFavoriteRestaurantMinimalOrderByName(): Flow<List<RestaurantMinimal>>
 
-    @Query("SELECT * FROM restaurant_minimal WHERE isFavorite = 1 ORDER BY distanceOrder")
+    @Query("SELECT m.* FROM restaurant_minimal AS m INNER JOIN restaurant ON m.id = restaurant.id WHERE m.menus IS NOT NULL AND restaurant.isFavorite = 1 ORDER BY restaurant.distanceOrder")
     abstract fun getFavoriteRestaurantMinimalOrderByDistance(): Flow<List<RestaurantMinimal>>
 
     @Query("DELETE  FROM restaurant_minimal")
@@ -32,11 +32,4 @@ abstract class RestaurantMinimalDao: BaseDao<RestaurantMinimal> {
         deleteAll()
         insertAll(restaurantMinimals)
     }
-
-    @Query("UPDATE restaurant_minimal SET isFavorite = :isFavorite WHERE id = :id")
-    protected abstract suspend fun updateIsFavoriteOfRestaurantMinimalById(isFavorite: Boolean, id: Long)
-
-    suspend fun updateRestaurantMinimalAsFavorite(id: Long) = updateIsFavoriteOfRestaurantMinimalById(true, id)
-
-    suspend fun updateRestaurantMinimalAsNotFavorite(id: Long) = updateIsFavoriteOfRestaurantMinimalById(false, id)
 }

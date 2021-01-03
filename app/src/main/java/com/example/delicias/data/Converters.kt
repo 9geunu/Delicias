@@ -10,12 +10,12 @@ class Converters {
     @TypeConverter
     fun fromString(value: String?): List<Menu>? {
         val listType: Type = object : TypeToken<List<Menu>?>() {}.getType()
-        return Gson().fromJson(value, listType)
+        return if (value == null) null else Gson().fromJson(value, listType)
     }
 
     @TypeConverter
     fun fromArrayList(list: List<Menu>?): String? {
         val gson = Gson()
-        return gson.toJson(list)
+        return if (list == null) null else gson.toJson(list)
     }
 }

@@ -10,7 +10,6 @@ data class RestaurantMinimal(
     val id: Long,
     val name: String,
     @Embedded
-    val meal: Meal,
-    var isFavorite: Boolean,
-    var distanceOrder: Int = 0
+    val meal: Meal?,
+    var isFavorite: Boolean
 )

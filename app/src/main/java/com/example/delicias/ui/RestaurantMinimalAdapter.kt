@@ -30,7 +30,6 @@ class RestaurantMinimalAdapter(val context: Context, val viewModel: ViewModel) :
         }
     }
     private val restaurantDao = LocalRestaurantDataStore.getInstance(context.applicationContext).restaurantDao()
-    private val restaurantMinimalDao = LocalRestaurantDataStore.getInstance(context.applicationContext).restaurantMinimalDao()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         var inflater = LayoutInflater.from(parent.context)
@@ -45,7 +44,7 @@ class RestaurantMinimalAdapter(val context: Context, val viewModel: ViewModel) :
         with(holder) {
             name.text = restaurantMinimal.name
             menus.layoutManager = LinearLayoutManager(context)
-            menus.adapter = MenuAdapter(restaurantMinimal.meal.menus)
+            menus.adapter = MenuAdapter(restaurantMinimal.meal?.menus)
             favoriteButton.isChecked = restaurantMinimal.isFavorite
         }
 
@@ -53,13 +52,11 @@ class RestaurantMinimalAdapter(val context: Context, val viewModel: ViewModel) :
             if (holder.favoriteButton.isChecked){
                 runBlocking {
                     restaurantDao.updateRestaurantAsFavorite(restaurantMinimal.id)
-                    restaurantMinimalDao.updateRestaurantMinimalAsFavorite(restaurantMinimal.id)
                 }
             }
             else {
                 runBlocking {
                     restaurantDao.updateRestaurantAsNotFavorite(restaurantMinimal.id)
-                    restaurantMinimalDao.updateRestaurantMinimalAsNotFavorite(restaurantMinimal.id)
                 }
             }
         }

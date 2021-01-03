@@ -16,18 +16,6 @@ class FavoritesViewModel(private val repository: RestaurantRepository) : ViewMod
     val dateLiveData: LiveData<ArrayList<Date>>
         get() = _dateLiveData
 
-    fun getAllFavoriteBreakfast(): LiveData<List<RestaurantMinimal>> {
-        return repository.getAllFavoriteBreakfast().asLiveData(viewModelScope.coroutineContext)
-    }
-
-    fun getAllFavoriteLunch(): LiveData<List<RestaurantMinimal>> {
-        return repository.getAllFavoriteLunch().asLiveData(viewModelScope.coroutineContext)
-    }
-
-    fun getAllFavoriteDinner(): LiveData<List<RestaurantMinimal>> {
-        return repository.getAllFavoriteDinner().asLiveData(viewModelScope.coroutineContext)
-    }
-
     suspend fun updateBreakfast() {
         repository.updateBreakfast()
     }

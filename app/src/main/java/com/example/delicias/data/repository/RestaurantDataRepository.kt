@@ -54,18 +54,6 @@ class RestaurantDataRepository(
         restaurantDao.updateDistanceOrderOfRestaurantById(id, distanceOrder)
     }
 
-    override fun getAllFavoriteBreakfast(): Flow<List<RestaurantMinimal>> {
-        return restaurantDao.getAllFavoriteBreakfast()
-    }
-
-    override fun getAllFavoriteLunch(): Flow<List<RestaurantMinimal>> {
-        return restaurantDao.getAllFavoriteLunch()
-    }
-
-    override fun getAllFavoriteDinner(): Flow<List<RestaurantMinimal>> {
-        return restaurantDao.getAllFavoriteDinner()
-    }
-
     override fun searchForBreakfast(searchquery: String): Flow<List<RestaurantMinimal>> {
         return restaurantDao.searchForBreakfast(searchquery)
     }

@@ -1,6 +1,5 @@
 package com.example.delicias.ui.map
 
-import android.animation.ValueAnimator
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -20,6 +19,8 @@ import com.example.delicias.R
 import com.example.delicias.data.repository.RestaurantDataRepository
 import com.example.delicias.data.repository.datasource.LocalRestaurantDataStore
 import com.example.delicias.databinding.FragmentMapBinding
+import com.example.delicias.domain.Menu
+import com.example.delicias.domain.Restaurant
 import com.example.delicias.ui.AnimationOnClickListener
 import com.example.delicias.ui.MenuAdapter
 import com.example.delicias.ui.RestaurantSearchAdapter
@@ -34,6 +35,7 @@ import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.util.FusedLocationSource
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import java.util.*
 import java.util.concurrent.Executors
 
 class MapFragment : Fragment(), OnMapReadyCallback, SearchView.OnQueryTextListener {
@@ -57,8 +59,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, SearchView.OnQueryTextListen
             val restaurant = restaurantDataRepository.getRestaurantById(marker.tag as Long).first()
             binding.restaurant = restaurant
             binding.rvMenuItem.layoutManager = LinearLayoutManager(context)
-            binding.rvMenuItem.adapter = MenuAdapter(restaurant.lunch.menus)
-            MenuAdapter(restaurant.lunch.menus)
+            binding.rvMenuItem.adapter = MenuAdapter(restaurant.getCurrentMeal())
         }
         if (binding.cvRestaurantInfo.isVisible) {
             mapViewModel.setRestaurantInfoInVisible()
@@ -277,5 +278,17 @@ class MapFragment : Fragment(), OnMapReadyCallback, SearchView.OnQueryTextListen
             if (it != null)
                 restaurantSearchAdapter.submitList(it)
         })
+    }
+
+    private fun Restaurant.getCurrentMeal(): List<Menu>? {
+        val calendar: Calendar = Calendar.getInstance()
+        val timeOfDay: Int = calendar.get(Calendar.HOUR_OF_DAY)
+
+        return when (timeOfDay) {
+            in 0..9 -> this.breakfast?.menus
+            in 10..14 -> this.lunch?.menus
+            in 15..23 -> this.dinner?.menus
+            else -> error("No Such Hour $timeOfDay")
+        }
     }
 }

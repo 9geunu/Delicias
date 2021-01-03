@@ -25,11 +25,11 @@ data class Restaurant(
     @SerializedName("date")
     val date: String,
     @Embedded(prefix = "breakfast_")
-    val breakfast: Meal,
+    val breakfast: Meal?,
     @Embedded(prefix = "lunch_")
-    val lunch: Meal,
+    val lunch: Meal?,
     @Embedded(prefix = "dinner_")
-    val dinner: Meal,
+    val dinner: Meal?,
     @SerializedName("latitude")
     val latitude: Double,
     @SerializedName("longitude")

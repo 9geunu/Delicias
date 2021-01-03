@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.delicias.R
 import com.example.delicias.domain.Menu
 
-class MenuAdapter(var menuList: List<Menu>): RecyclerView.Adapter<MenuAdapter.ViewHolder>() {
+class MenuAdapter(var menuList: List<Menu>?): RecyclerView.Adapter<MenuAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         var inflater = LayoutInflater.from(parent.context)
@@ -18,14 +18,16 @@ class MenuAdapter(var menuList: List<Menu>): RecyclerView.Adapter<MenuAdapter.Vi
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        var item = menuList.get(position)
+        var item = menuList?.get(position)
 
-        holder.menuName.text = item.name
-        holder.menuPrice.text = item.price.toString()
+        if (item != null) {
+            holder.menuName.text = item.name
+            holder.menuPrice.text = item.price.toString()
+        }
     }
 
     override fun getItemCount(): Int {
-        return menuList.size
+        return menuList?.size ?: 0
     }
 
     class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){

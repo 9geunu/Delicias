@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class Meal(
     @SerializedName("menus")
-    val menus: List<Menu>,
+    val menus: List<Menu>?,
     @SerializedName("message")
     val message: String,
     @SerializedName("isValid")
