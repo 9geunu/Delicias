@@ -27,7 +27,7 @@
                         app:layout_constraintLeft_toRightOf="parent"
                         app:layout_constraintRight_toLeftOf="parent"
                         android:padding="8dp"
-                        android:text="설정"
+                        android:text="@string/str_setting"
                         android:textStyle="bold"
                         android:textSize="16sp"
                         android:textColor="#ed4e31"
@@ -47,8 +47,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
-                android:text="공지사항"
-                android:textSize="16sp"/>
+                android:text="@string/notice"
+                android:textSize="16sp"
+                android:layout_marginStart="20dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -62,8 +63,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
-                android:text="의견 보내기"
-                android:textSize="16sp"/>
+                android:text="@string/send_opinion"
+                android:textSize="16sp"
+                android:layout_marginStart="20dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -77,15 +79,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
-                android:text="버전 정보"
-                android:textSize="16sp"/>
+                android:text="@string/version_info"
+                android:textSize="16sp"
+                android:layout_marginStart="20dp" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="240dp"
                 android:text="v 1.0.0"
                 android:textSize="16sp"
-                android:textColor="#ed4e31"/>
+                android:textColor="#ed4e31"
+                android:layout_marginStart="240dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -99,13 +103,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
-                android:text="메뉴 없는 식당 안보기"
-                android:textSize="16sp"/>
+                android:text="@string/hide_menuless_restaurant"
+                android:textSize="16sp"
+                android:layout_marginStart="20dp" />
 
-            <Switch
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/sw_hide_menuless_restaurant"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="170dp"/>
+                android:layout_marginLeft="170dp"
+                android:layout_marginStart="170dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -120,8 +127,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
-                android:text="만든 사람들"
-                android:textSize="16sp"/>
+                android:text="@string/developers"
+                android:textSize="16sp"
+                android:layout_marginStart="20dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -135,16 +143,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
-                android:text="서버"
-                android:textSize="16sp"/>
+                android:text="@string/server_info"
+                android:textSize="16sp"
+                android:layout_marginStart="20dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="280dp"
-                android:text="Mock"
+                android:text="@string/mock_server"
                 android:textSize="16sp"
-                android:textColor="#ed4e31"/>
+                android:textColor="#ed4e31"
+                android:layout_marginStart="280dp" />
         </LinearLayout>
     </LinearLayout>
 </layout>
