@@ -1,12 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Delicias</string>
-
-    <!-- Bottom Navigation View -->
-    <string name="home">home</string>
-    <string name="favorites">favorites</string>
-    <string name="map">map</string>
-    <string name="setting">setting</string>
-    <string name="empty_favorite_cafeterias">즐겨찾는 식당이 없습니다.</string>
     <string name="hide_menuless_restaurant">메뉴 없는 식당 안보기</string>
     <string name="developers">만든 사람들</string>
     <string name="server_info">서버</string>
