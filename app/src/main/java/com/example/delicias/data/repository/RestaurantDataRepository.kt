@@ -1,18 +1,21 @@
 package com.example.delicias.data.repository
 
-import com.example.delicias.data.repository.datasource.RemoteRestaurantDataStore
+import android.content.Context
+import com.example.delicias.data.repository.datasource.*
 import com.example.delicias.domain.Restaurant
-import com.example.delicias.data.repository.datasource.RestaurantDao
-import com.example.delicias.data.repository.datasource.RestaurantMinimalDao
 import com.example.delicias.domain.RestaurantMinimal
+import com.example.delicias.domain.SearchHistory
+import com.example.delicias.domain.SettingPreference
 import com.example.delicias.domain.repository.RestaurantRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import java.lang.Exception
 
-class RestaurantDataRepository(
-    private val restaurantDao: RestaurantDao,
-    private val restaurantMinimalDao: RestaurantMinimalDao) : RestaurantRepository{
+class RestaurantDataRepository(context: Context) : RestaurantRepository{
+    private val restaurantDao = LocalRestaurantDataStore.getInstance(context).restaurantDao()
+    private val restaurantMinimalDao = LocalRestaurantDataStore.getInstance(context).restaurantMinimalDao()
+    private val searchHistoryDao = LocalRestaurantDataStore.getInstance(context).searchHistoryDao()
+    private val settingPreferenceDao = LocalRestaurantDataStore.getInstance(context).settingPreferenceDao()
 
     override fun getRestaurantsFromRemote(): Flow<List<Restaurant>> {
         return try {
@@ -99,5 +102,41 @@ class RestaurantDataRepository(
     override suspend fun updateDinner() {
         val dinnerList = restaurantDao.getAllDinner().first()
         restaurantMinimalDao.updateRestaurantMinimals(dinnerList)
+    }
+
+    override suspend fun insertSettingPreference(settingPreference: SettingPreference) {
+        settingPreferenceDao.insert(settingPreference)
+    }
+
+    override fun isMenuLessRestaurantHidden(): Flow<Boolean> {
+        return settingPreferenceDao.isMenuLessRestaurantHidden()
+    }
+
+    override fun isPushEnabled(): Flow<Boolean> {
+        return settingPreferenceDao.isPushEnabled()
+    }
+
+    override suspend fun updateIsMenuLessRestaurantHidden(isHidden: Boolean) {
+        settingPreferenceDao.updateIsMenuLessRestaurantHidden(isHidden)
+    }
+
+    override suspend fun updateIsPushEnabled(isEnabled: Boolean) {
+        settingPreferenceDao.updateIsPushEnabled(isEnabled)
+    }
+
+    override suspend fun insertSearchHistory(searchHistory: SearchHistory) {
+        searchHistoryDao.insert(searchHistory)
+    }
+
+    override fun getAllSearchHistory(): Flow<List<SearchHistory>> {
+        return searchHistoryDao.getAll()
+    }
+
+    override suspend fun deleteAllSearchHistory() {
+        searchHistoryDao.deleteAll()
+    }
+
+    override suspend fun deleteSearchHistoryById(id: Long) {
+        searchHistoryDao.deleteById(id)
     }
 }

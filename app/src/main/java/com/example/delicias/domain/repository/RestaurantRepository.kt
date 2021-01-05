@@ -2,6 +2,8 @@ package com.example.delicias.domain.repository
 
 import com.example.delicias.domain.Restaurant
 import com.example.delicias.domain.RestaurantMinimal
+import com.example.delicias.domain.SearchHistory
+import com.example.delicias.domain.SettingPreference
 import kotlinx.coroutines.flow.Flow
 
 interface RestaurantRepository {
@@ -29,4 +31,15 @@ interface RestaurantRepository {
     suspend fun updateBreakfast()
     suspend fun updateLunch()
     suspend fun updateDinner()
+
+    suspend fun insertSettingPreference(settingPreference: SettingPreference)
+    fun isMenuLessRestaurantHidden(): Flow<Boolean>
+    fun isPushEnabled(): Flow<Boolean>
+    suspend fun updateIsMenuLessRestaurantHidden(isHidden: Boolean)
+    suspend fun updateIsPushEnabled(isEnabled: Boolean)
+
+    suspend fun insertSearchHistory(searchHistory: SearchHistory)
+    fun getAllSearchHistory(): Flow<List<SearchHistory>>
+    suspend fun deleteAllSearchHistory()
+    suspend fun deleteSearchHistoryById(id: Long)
 }

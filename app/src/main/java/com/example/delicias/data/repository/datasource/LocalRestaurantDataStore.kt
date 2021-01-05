@@ -8,12 +8,16 @@ import androidx.room.TypeConverters
 import com.example.delicias.data.Converters
 import com.example.delicias.domain.Restaurant
 import com.example.delicias.domain.RestaurantMinimal
+import com.example.delicias.domain.SearchHistory
+import com.example.delicias.domain.SettingPreference
 
-@Database(entities = [RestaurantMinimal::class, Restaurant::class], version = 9)
+@Database(entities = [RestaurantMinimal::class, Restaurant::class, SearchHistory::class, SettingPreference::class], version = 10)
 @TypeConverters(Converters::class)
 abstract class LocalRestaurantDataStore : RoomDatabase() {
     abstract fun restaurantDao(): RestaurantDao
     abstract fun restaurantMinimalDao(): RestaurantMinimalDao
+    abstract fun searchHistoryDao(): SearchHistoryDao
+    abstract fun settingPreferenceDao(): SettingPreferenceDao
 
     companion object {
         val DB_NAME = "restaurant-db"
