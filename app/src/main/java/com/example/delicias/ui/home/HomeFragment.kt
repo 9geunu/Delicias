@@ -50,10 +50,8 @@ class HomeFragment : Fragment(), SearchView.OnQueryTextListener {
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
         lifecycleOwner = viewLifecycleOwner
-        val restaurantDao = LocalRestaurantDataStore.getInstance(this.requireContext()).restaurantDao()
-        val restaurantMinimalDao = LocalRestaurantDataStore.getInstance(this.requireContext()).restaurantMinimalDao()
 
-        restaurantDataRepository = RestaurantDataRepository(restaurantDao, restaurantMinimalDao)
+        restaurantDataRepository = RestaurantDataRepository(requireContext())
         val factory = HomeViewModelFactory(restaurantDataRepository)
         homeViewModel = ViewModelProviders.of(this, factory).get(HomeViewModel::class.java)
 
@@ -99,11 +97,9 @@ class HomeFragment : Fragment(), SearchView.OnQueryTextListener {
                     runBlocking {
                         Util.sortByLocation(requireContext(), restaurantDataRepository)
                         refresh()
-                        spinnerItemLiveData.postValue(position)
                     }
                 }
-                else
-                    spinnerItemLiveData.postValue(position)
+                spinnerItemLiveData.postValue(position)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {

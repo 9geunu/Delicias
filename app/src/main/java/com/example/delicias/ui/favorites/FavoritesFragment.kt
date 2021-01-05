@@ -48,10 +48,8 @@ class FavoritesFragment : Fragment() {
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_favorites, container, false)
         lifecycleOwner = viewLifecycleOwner
-        val restaurantDao = LocalRestaurantDataStore.getInstance(this.requireContext()).restaurantDao()
-        val restaurantMinimalDao = LocalRestaurantDataStore.getInstance(this.requireContext()).restaurantMinimalDao()
 
-        restaurantDataRepository = RestaurantDataRepository(restaurantDao, restaurantMinimalDao)
+        restaurantDataRepository = RestaurantDataRepository(requireContext())
         val factory = FavoritesViewModelFactory(restaurantDataRepository)
         favoritesViewModel = ViewModelProviders.of(this, factory).get(FavoritesViewModel::class.java)
 
@@ -89,11 +87,9 @@ class FavoritesFragment : Fragment() {
                     runBlocking {
                         Util.sortByLocation(requireContext(), restaurantDataRepository)
                         refresh()
-                        spinnerItemLiveData.postValue(position)
                     }
                 }
-                else
-                    spinnerItemLiveData.postValue(position)
+                spinnerItemLiveData.postValue(position)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {

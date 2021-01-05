@@ -87,10 +87,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, SearchView.OnQueryTextListen
         savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_map, container, false)
-        val restaurantDao = LocalRestaurantDataStore.getInstance(this.requireContext()).restaurantDao()
-        val restaurantMinimalDao = LocalRestaurantDataStore.getInstance(this.requireContext()).restaurantMinimalDao()
 
-        restaurantDataRepository = RestaurantDataRepository(restaurantDao, restaurantMinimalDao)
+        restaurantDataRepository = RestaurantDataRepository(requireContext())
         val factory = MapViewModelFactory(restaurantDataRepository, requireContext())
         mapViewModel = ViewModelProviders.of(this, factory).get(MapViewModel::class.java)
 
