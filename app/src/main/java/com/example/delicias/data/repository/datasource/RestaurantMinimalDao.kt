@@ -12,16 +12,16 @@ abstract class RestaurantMinimalDao: BaseDao<RestaurantMinimal> {
     @Query("SELECT * FROM restaurant_minimal")
     abstract fun getRestaurantMinimals(): Flow<List<RestaurantMinimal>>
 
-    @Query("SELECT * FROM restaurant_minimal WHERE restaurant_minimal.menus IS NOT NULL ORDER BY name")
+    @Query("SELECT m.* FROM restaurant_minimal m LEFT OUTER JOIN setting_preference s WHERE CASE WHEN s.isMenuLessRestaurantHidden THEN m.menus IS NOT NULL ELSE m.menus IS NOT NULL OR m.menus IS NULL END ORDER BY name")
     abstract fun getRestaurantMinimalOrderByName(): Flow<List<RestaurantMinimal>>
 
-    @Query("SELECT m.* FROM restaurant_minimal AS m INNER JOIN restaurant ON m.id = restaurant.id WHERE m.menus IS NOT NULL ORDER BY restaurant.distanceOrder")
+    @Query("SELECT m.* FROM restaurant_minimal m INNER JOIN restaurant USING(id) LEFT OUTER JOIN setting_preference s WHERE CASE WHEN s.isMenuLessRestaurantHidden THEN m.menus IS NOT NULL ELSE m.menus IS NOT NULL OR m.menus IS NULL END ORDER BY restaurant.distanceOrder")
     abstract fun getRestaurantMinimalOrderByDistance(): Flow<List<RestaurantMinimal>>
 
-    @Query("SELECT m.* FROM restaurant_minimal AS m INNER JOIN restaurant ON m.id = restaurant.id WHERE m.menus IS NOT NULL AND restaurant.isFavorite = 1 ORDER BY m.name")
+    @Query("SELECT m.* FROM restaurant_minimal m INNER JOIN restaurant USING(id) LEFT OUTER JOIN setting_preference s WHERE CASE WHEN s.isMenuLessRestaurantHidden THEN m.menus IS NOT NULL ELSE m.menus IS NOT NULL OR m.menus IS NULL END AND restaurant.isFavorite = 1 ORDER BY m.name")
     abstract fun getFavoriteRestaurantMinimalOrderByName(): Flow<List<RestaurantMinimal>>
 
-    @Query("SELECT m.* FROM restaurant_minimal AS m INNER JOIN restaurant ON m.id = restaurant.id WHERE m.menus IS NOT NULL AND restaurant.isFavorite = 1 ORDER BY restaurant.distanceOrder")
+    @Query("SELECT m.* FROM restaurant_minimal m INNER JOIN restaurant USING(id) LEFT OUTER JOIN setting_preference s WHERE CASE WHEN s.isMenuLessRestaurantHidden THEN m.menus IS NOT NULL ELSE m.menus IS NOT NULL OR m.menus IS NULL END AND restaurant.isFavorite = 1 ORDER BY restaurant.distanceOrder")
     abstract fun getFavoriteRestaurantMinimalOrderByDistance(): Flow<List<RestaurantMinimal>>
 
     @Query("DELETE  FROM restaurant_minimal")
