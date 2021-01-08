@@ -8,4 +8,10 @@
     <string name="send_opinion">의견 보내기</string>
     <string name="notice">공지사항</string>
     <string name="str_setting">설정</string>
+    <string name="restaurant_map_title">식당 지도</string>
+    <string name="today_menu">오늘의 메뉴</string>
+    <string name="location">위치</string>
+    <string name="operation_time">운영시간</string>
+    <string name="copy_address">주소 복사</string>
+    <string name="find_road">길 찾기</string>
 </resources>
