@@ -15,7 +15,7 @@ import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.NaverMap
 
 
-class RestaurantSearchAdapter(val naverMap: NaverMap, val mapViewModel: MapViewModel) :
+class RestaurantSearchAdapter(val naverMap: NaverMap) :
     ListAdapter<Restaurant, RestaurantSearchAdapter.ViewHolder>(diffUtil){
     companion object {
         val diffUtil = object: DiffUtil.ItemCallback<Restaurant>() {
@@ -41,7 +41,6 @@ class RestaurantSearchAdapter(val naverMap: NaverMap, val mapViewModel: MapViewM
             val cameraUpdate = CameraUpdate.scrollTo(LatLng(restaurant.latitude, restaurant.longitude))
                 .animate(CameraAnimation.Easing)
             naverMap.moveCamera(cameraUpdate)
-            mapViewModel.setRestaurantSearchResultInvisible()
         }
     }
 

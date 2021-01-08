@@ -4,30 +4,43 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.app.Activity
 import android.content.Context
+import android.graphics.Color
 import android.graphics.PointF
 import android.util.DisplayMetrics
 import android.view.View
-import android.view.ViewGroup
 import android.view.animation.Interpolator
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.core.content.ContextCompat
+import com.example.delicias.R
+import com.example.delicias.databinding.FragmentMapBinding
+import com.example.delicias.domain.Restaurant
 import com.naver.maps.map.CameraAnimation
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.NaverMap
 
 class AnimationOnClickListener @JvmOverloads internal constructor(
-    context: Context,
+    private val context: Context,
     private val view: View,
     private val map: View,
     private val naverMap: NaverMap,
+    private val binding: FragmentMapBinding,
     private val interpolator: Interpolator? = null) : View.OnClickListener {
 
     private val animatorSet = AnimatorSet()
     private val height: Int
     private var isRestaurantDetailInfoShown = false
+    private var tvMapTitle: TextView
+    private var ivSearchRestaurant: ImageView
+    private var ivBackButton: ImageView
 
     init {
         val displayMetrics = DisplayMetrics()
         (context as Activity).windowManager.defaultDisplay.getMetrics(displayMetrics)
         height = displayMetrics.heightPixels
+        tvMapTitle = context.findViewById(R.id.tv_map_title)
+        ivSearchRestaurant = context.findViewById(R.id.iv_search_restaurant)
+        ivBackButton = context.findViewById(R.id.iv_map_title_back_button)
     }
 
     override fun onClick(v: View?) {
@@ -38,6 +51,16 @@ class AnimationOnClickListener @JvmOverloads internal constructor(
         animatorSet.removeAllListeners()
         animatorSet.end()
         animatorSet.cancel()
+
+        if (binding.restaurant != null) {
+            val restaurant = binding.restaurant
+            tvMapTitle.text = restaurant?.name
+            tvMapTitle.setTextColor(Color.BLACK)
+        }
+        else
+            tvMapTitle.text = "식당 정보를 가져올 수 없습니다."
+        ivSearchRestaurant.visibility = View.INVISIBLE
+        ivBackButton.visibility = View.VISIBLE
 
         val cameraUpdate = CameraUpdate.scrollBy(PointF(0F, map.measuredHeight*(0.4F)))
             .animate(CameraAnimation.None)
@@ -67,6 +90,11 @@ class AnimationOnClickListener @JvmOverloads internal constructor(
         animatorSet.removeAllListeners()
         animatorSet.end()
         animatorSet.cancel()
+
+        tvMapTitle.text = context.getString(R.string.restaurant_map_title)
+        tvMapTitle.setTextColor(ContextCompat.getColor(context, R.color.orange))
+        ivSearchRestaurant.visibility = View.VISIBLE
+        ivBackButton.visibility = View.INVISIBLE
 
         val cameraUpdate = CameraUpdate.scrollBy(PointF(0F, map.measuredHeight*(-0.4F)))
             .animate(CameraAnimation.None)

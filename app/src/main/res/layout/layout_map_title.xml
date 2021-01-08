@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/shape_setting_item">
+
+    <ImageView
+        android:id="@+id/iv_map_title_back_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:src="@drawable/left_gray"
+        android:layout_margin="8dp"
+        app:layout_constraintTop_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginStart="10dp"
+        android:visibility="invisible"/>
+
+    <TextView
+        android:id="@+id/tv_map_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:textColor="@color/orange"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:text="@string/restaurant_map_title"
+        android:textSize="18sp"/>
+
+    <ImageView
+        android:id="@+id/iv_search_restaurant"
+        app:layout_constraintTop_toTopOf="@+id/tv_map_title"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_map_title"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginRight="26dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/search"
+        android:layout_marginEnd="26dp" />
+</androidx.constraintlayout.widget.ConstraintLayout>

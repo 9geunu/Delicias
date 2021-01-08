@@ -15,9 +15,9 @@ import java.net.URLEncoder
 
 class MapViewModel(private val repository: RestaurantRepository, private val context: Context) : ViewModel() {
     var isRestaurantInfoCardViewVisible = MutableLiveData<Boolean>()
-    var isRestaurantSearchResultVisible = MutableLiveData<Boolean>()
     var mapSizePercentage = MutableLiveData<Float>(100F)
 
+    //TODO 이 로직 수정 ㄱ ㄱ
     fun onFavoriteButtonClick(restaurant: Restaurant){
         if (restaurant.isFavorite){
             restaurant.isFavorite = false
@@ -87,14 +87,6 @@ class MapViewModel(private val repository: RestaurantRepository, private val con
 
     fun setRestaurantDetailInfoInvisible(){
         mapSizePercentage.value = 100F
-    }
-
-    fun setRestaurantSearchResultVisible(){
-        isRestaurantSearchResultVisible.value = true
-    }
-
-    fun setRestaurantSearchResultInvisible(){
-        isRestaurantSearchResultVisible.value = false
     }
 
     fun searchRestaurant(query: String): LiveData<List<Restaurant>> {

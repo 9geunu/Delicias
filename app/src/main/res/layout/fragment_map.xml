@@ -33,25 +33,39 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
-                    <TextView
+
+                    <ImageView
+                        android:id="@+id/iv_detail_location"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:layout_constraintTop_toBottomOf="parent"
-                        app:layout_constraintBottom_toTopOf="parent"
+                        android:src="@drawable/location_2x"
+                        app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintLeft_toLeftOf="parent"
-                        android:layout_marginLeft="30dp"
-                        android:text="위치"
-                        android:textSize="18sp"/>
+                        android:layout_marginTop="8dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginStart="10dp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:layout_constraintTop_toBottomOf="parent"
-                        app:layout_constraintBottom_toTopOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/iv_detail_location"
+                        app:layout_constraintBottom_toBottomOf="@id/iv_detail_location"
+                        app:layout_constraintLeft_toRightOf="@id/iv_detail_location"
+                        android:layout_marginLeft="10dp"
+                        android:text="@string/location"
+                        android:textSize="18sp"
+                        android:layout_marginStart="10dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintTop_toTopOf="@id/iv_detail_location"
+                        app:layout_constraintBottom_toBottomOf="@id/iv_detail_location"
                         app:layout_constraintRight_toRightOf="parent"
                         android:layout_marginRight="30dp"
                         android:text="@{restaurant.place}"
-                        android:textSize="18sp"/>
+                        android:textSize="18sp"
+                        android:layout_marginEnd="30dp" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </LinearLayout>
 
@@ -71,7 +85,8 @@
                         android:src="@drawable/clock"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintLeft_toLeftOf="parent"
-                        android:layout_marginLeft="10dp"/>
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginStart="10dp" />
                     <TextView
                         android:id="@+id/tv_open_time_title"
                         android:layout_width="wrap_content"
@@ -79,8 +94,9 @@
                         app:layout_constraintTop_toTopOf="@+id/iv_clock"
                         app:layout_constraintLeft_toRightOf="@+id/iv_clock"
                         android:layout_marginLeft="10dp"
-                        android:text="운영시간"
-                        android:textSize="18sp"/>
+                        android:text="@string/operation_time"
+                        android:textSize="18sp"
+                        android:layout_marginStart="10dp" />
                     <TextView
                         android:id="@+id/tv_open_time_detail"
                         android:layout_width="wrap_content"
@@ -90,7 +106,8 @@
                         android:layout_marginLeft="5dp"
                         android:layout_marginTop="10dp"
                         android:textSize="14sp"
-                        android:text="@{restaurant.lunchTime}"/>
+                        android:text="@{restaurant.lunchTime}"
+                        android:layout_marginStart="5dp" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </LinearLayout>
 
@@ -104,18 +121,28 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
+                    <ImageView
+                        android:id="@+id/iv_menu"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/menu"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginStart="10dp" />
+
                     <TextView
                         android:id="@+id/tv_cafeteria_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginLeft="16dp"
-                        android:layout_marginTop="8dp"
-                        android:text="오늘의 메뉴"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/today_menu"
                         android:textColor="#000000"
                         android:textSize="18sp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="@+id/iv_menu"
+                        app:layout_constraintLeft_toRightOf="@+id/iv_menu"
+                        android:layout_marginLeft="10dp" />
 
                     <LinearLayout
                         android:id="@+id/ll_division"
@@ -143,41 +170,7 @@
             android:layout_height="wrap_content"
             android:background="#ffffff">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/shape_setting_item">
-
-                <TextView
-                    android:id="@+id/tv_toolbar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintLeft_toRightOf="parent"
-                    app:layout_constraintRight_toLeftOf="parent"
-                    android:padding="8dp"
-                    android:text="식당 지도"
-                    android:textSize="22sp"
-                    tools:layout_editor_absoluteX="45dp"
-                    tools:layout_editor_absoluteY="0dp" />
-
-                <SearchView
-                    android:id="@+id/sv_search_restaurant"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_toolbar"
-                    app:layout_constraintBottom_toTopOf="@+id/tv_toolbar"
-                    app:layout_constraintRight_toRightOf="parent"
-                    android:layout_marginRight="26dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end|center_horizontal"
-                    android:tint="#adb5bd" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_search_restaurant_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                visible="@{viewModel.isRestaurantSearchResultVisible}"/>
+            <include android:id="@+id/map_title" layout="@layout/layout_map_title"/>
 
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -220,7 +213,8 @@
                     android:layout_marginTop="10dp"
                     android:layout_marginLeft="20dp"
                     android:textSize="20sp"
-                    android:text="@{restaurant.name}" />
+                    android:text="@{restaurant.name}"
+                    android:layout_marginStart="20dp" />
 
                 <ToggleButton
                     android:id="@+id/btn_favorite"
@@ -252,9 +246,10 @@
                     android:text="@{restaurant.place}"
                     android:textSize="13sp"
                     app:layout_constraintLeft_toRightOf="@+id/iv_location"
-                    app:layout_constraintTop_toBottomOf="@+id/iv_location"
-                    app:layout_constraintBottom_toTopOf="@+id/iv_location"
-                    android:layout_marginLeft="6dp"/>
+                    app:layout_constraintTop_toTopOf="@+id/iv_location"
+                    app:layout_constraintBottom_toBottomOf="@+id/iv_location"
+                    android:layout_marginLeft="6dp"
+                    android:layout_marginStart="6dp" />
 
                 <ImageView
                     android:id="@+id/iv_call"
@@ -271,9 +266,10 @@
                     android:text="@{restaurant.contact}"
                     android:textSize="13sp"
                     app:layout_constraintLeft_toRightOf="@+id/iv_call"
-                    app:layout_constraintTop_toBottomOf="@+id/iv_call"
-                    app:layout_constraintBottom_toTopOf="@+id/iv_call"
-                    android:layout_marginLeft="6dp"/>
+                    app:layout_constraintTop_toTopOf="@+id/iv_call"
+                    app:layout_constraintBottom_toBottomOf="@+id/iv_call"
+                    android:layout_marginLeft="6dp"
+                    android:layout_marginStart="6dp" />
 
 
                 <LinearLayout
@@ -306,11 +302,12 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:src="@drawable/file_copy"
-                            android:layout_marginRight="8dp"/>
+                            android:layout_marginRight="8dp"
+                            android:layout_marginEnd="8dp" />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="주소 복사"
+                            android:text="@string/copy_address"
                             android:textSize="15sp"/>
                     </LinearLayout>
 
@@ -334,11 +331,12 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:src="@drawable/navigation"
-                            android:layout_marginRight="8dp"/>
+                            android:layout_marginRight="8dp"
+                            android:layout_marginEnd="8dp" />
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="길 찾기"
+                            android:text="@string/find_road"
                             android:textSize="15sp"/>
                     </LinearLayout>
                 </LinearLayout>

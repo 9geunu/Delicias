@@ -1,5 +1,6 @@
 package com.example.delicias.ui.map
 
+import android.app.Activity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -7,7 +8,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.SearchView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -33,12 +36,14 @@ import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.Overlay
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.util.FusedLocationSource
+import kotlinx.android.synthetic.main.fragment_map.*
+import kotlinx.android.synthetic.main.layout_map_title.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import java.util.*
 import java.util.concurrent.Executors
 
-class MapFragment : Fragment(), OnMapReadyCallback, SearchView.OnQueryTextListener {
+class MapFragment : Fragment(), OnMapReadyCallback {
     lateinit var binding: FragmentMapBinding
     private lateinit var locationSource: FusedLocationSource
     private lateinit var naverMap: NaverMap
@@ -52,6 +57,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, SearchView.OnQueryTextListen
     private val pinDetailImage = OverlayImage.fromResource(R.drawable.pin_detail)
     private var markers = mutableListOf<Marker>()
     private lateinit var animatorListener: AnimationOnClickListener
+    private lateinit var ivSearchRestaurant: ImageView
     private val listener = Overlay.OnClickListener { overlay ->
         val marker = overlay as Marker
         Log.d("delitag", "setMarkers: ${marker.tag} 클릭됨")
@@ -76,10 +82,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, SearchView.OnQueryTextListen
         }
         true
     }
-    private val onCloseListener = SearchView.OnCloseListener {
-        mapViewModel.setRestaurantSearchResultInvisible()
-        false
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -94,13 +96,13 @@ class MapFragment : Fragment(), OnMapReadyCallback, SearchView.OnQueryTextListen
 
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = mapViewModel
-        binding.svSearchRestaurant.setOnQueryTextListener(this)
 
-        binding.svSearchRestaurant.setOnSearchClickListener {
-            mapViewModel.setRestaurantSearchResultVisible()
+
+        val mapTitle: View = binding.mapTitle
+        ivSearchRestaurant = (mapTitle as ConstraintLayout).getViewById(R.id.iv_search_restaurant) as ImageView
+        ivSearchRestaurant.setOnClickListener {
+            onBackPress()
         }
-
-        binding.svSearchRestaurant.setOnCloseListener(onCloseListener)
 
         val fm = childFragmentManager
         val mapFragment = fm.findFragmentById(R.id.map) as com.naver.maps.map.MapFragment?
@@ -160,16 +162,10 @@ class MapFragment : Fragment(), OnMapReadyCallback, SearchView.OnQueryTextListen
         uiSettings.isLocationButtonEnabled = false
         uiSettings.isZoomControlEnabled = false
 
-        restaurantSearchAdapter = RestaurantSearchAdapter(naverMap, mapViewModel)
-
-        animatorListener = AnimationOnClickListener(requireContext(), binding.clRestaurantInfo, binding.map, naverMap)
+        animatorListener = AnimationOnClickListener(requireContext(), binding.clRestaurantInfo, binding.map, naverMap, binding)
         binding.clRestaurantInfo.setOnClickListener(
             animatorListener
         )
-
-        binding.rvSearchRestaurantList.layoutManager = LinearLayoutManager(this.requireContext())
-        binding.rvSearchRestaurantList.itemAnimator = DefaultItemAnimator()
-        binding.rvSearchRestaurantList.adapter = restaurantSearchAdapter
 
         executorService.submit {
             setNaverMapOnClickListener(naverMap)
@@ -213,8 +209,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, SearchView.OnQueryTextListen
             if (mapViewModel.mapSizePercentage.value == 40F)
                 mapViewModel.setRestaurantDetailInfoInvisible()
 
-            onCloseListener.onClose()
-
             markers.filter { marker ->
                 marker.icon == pinDetailImage
             }.forEach { marker ->
@@ -245,37 +239,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, SearchView.OnQueryTextListen
             mapViewModel.setRestaurantDetailInfoInvisible()
             false
         } else true
-    }
-
-    override fun onQueryTextSubmit(query: String?): Boolean {
-        if (query.isNullOrEmpty())
-            mapViewModel.setRestaurantSearchResultInvisible()
-
-        if (query != null) {
-            getResults(query)
-        }
-        return false
-    }
-
-    override fun onQueryTextChange(newText: String?): Boolean {
-        if (newText.isNullOrEmpty())
-            mapViewModel.setRestaurantSearchResultInvisible()
-
-        if (newText != null) {
-            getResults(newText)
-        }
-        return false
-    }
-
-    private fun getResults(newText: String) {
-        if (!binding.svSearchRestaurant.isVisible)
-            mapViewModel.setRestaurantSearchResultVisible()
-
-        val queryText = "%$newText%"
-        mapViewModel.searchRestaurant(queryText).observe(viewLifecycleOwner, Observer {
-            if (it != null)
-                restaurantSearchAdapter.submitList(it)
-        })
     }
 
     private fun Restaurant.getCurrentMeal(): List<Menu>? {
