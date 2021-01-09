@@ -1,51 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".ui.SearchActivity">
-
-    <include android:id="@+id/search_title" layout="@layout/layout_map_title"/>
-
-    <androidx.appcompat.widget.SearchView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginStart="10dp"
-        android:text="최근 검색 결과"/>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
+    xmlns:tools="http://schemas.android.com/tools">
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".ui.SearchActivity"
+        android:background="#ffffff">
+
+        <include android:id="@+id/search_title" layout="@layout/layout_map_title"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="10dp"
+            android:background="@drawable/shape_orange_square">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/haksik_search"
+                android:layout_marginLeft="10dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="10dp" />
+
+            <androidx.appcompat.widget.SearchView
+                android:id="@+id/sv_search_restaurant"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:closeIcon="@drawable/close"
+                app:searchIcon="@drawable/search"
+                app:iconifiedByDefault="true"
+                app:searchHintIcon="@drawable/shape_transparent_circle"
+                android:animateLayoutChanges="true"
+                android:layoutDirection="rtl"/>
+        </LinearLayout>
+
 
         <TextView
+            android:id="@+id/tv_search_result"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="자동저장 끄기"
-            />
+            android:layout_marginBottom="10dp"
+            android:layout_marginStart="10dp"
+            android:text="최근 검색 결과"
+            android:layout_marginLeft="10dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_search_history"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="전체 삭제"/>
+            tools:listitem="@layout/item_search_history"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="end"
-            android:text="취소"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#e9ecef"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:gravity="center_vertical"
+            android:background="#fafafa"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_auto_save_mode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="자동저장 끄기"
+                />
+
+            <LinearLayout
+                android:layout_width="1dp"
+                android:layout_height="16dp"
+                android:background="#ced4da"/>
+
+            <TextView
+                android:id="@+id/tv_delete_all_history"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                android:text="전체 삭제"/>
+
+            <LinearLayout
+                android:layout_width="1dp"
+                android:layout_height="16dp"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:id="@+id/tv_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="취소"
+                android:layout_marginRight="10dp"
+                android:layout_marginEnd="10dp"
+                android:textColor="#343a40"
+                android:textSize="15sp"/>
+        </LinearLayout>
+
     </LinearLayout>
-
-</LinearLayout>
+</layout>
