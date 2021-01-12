@@ -3,5 +3,6 @@ package com.example.delicias.domain
 enum class MealTime{
     BREAKFAST,
     LUNCH,
-    DINNER
+    DINNER,
+    NOT_SET
 }

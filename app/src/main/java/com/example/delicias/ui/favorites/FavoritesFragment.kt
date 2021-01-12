@@ -36,7 +36,7 @@ class FavoritesFragment : Fragment() {
     lateinit var restaurantMinimalAdapter: RestaurantMinimalAdapter
     lateinit var lifecycleOwner: LifecycleOwner
     lateinit var restaurantDataRepository :RestaurantDataRepository
-    var currentMealTime = MealTime.BREAKFAST
+    var currentMealTime = MealTime.NOT_SET
     lateinit var restaurantMinimalLiveData: LiveData<List<RestaurantMinimal>>
     val scope = CoroutineScope(Dispatchers.Default)
     val spinnerItemLiveData = MutableLiveData<Int>(0)
@@ -132,6 +132,9 @@ class FavoritesFragment : Fragment() {
             }
             MealTime.DINNER -> {
                 favoritesViewModel.updateDinner()
+            }
+            MealTime.NOT_SET -> {
+                return
             }
         }
     }

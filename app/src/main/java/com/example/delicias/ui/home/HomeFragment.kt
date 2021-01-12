@@ -38,7 +38,7 @@ class HomeFragment : Fragment(), SearchView.OnQueryTextListener {
     lateinit var restaurantMinimalLiveData: LiveData<List<RestaurantMinimal>>
     lateinit var binding: FragmentHomeBinding
     lateinit var lifecycleOwner: LifecycleOwner
-    var currentMealTime = MealTime.BREAKFAST
+    var currentMealTime = MealTime.NOT_SET
     lateinit var restaurantDataRepository :RestaurantDataRepository
     val scope = CoroutineScope(Dispatchers.Default)
     val spinnerItemLiveData = MutableLiveData<Int>(0)
@@ -142,6 +142,9 @@ class HomeFragment : Fragment(), SearchView.OnQueryTextListener {
             }
             MealTime.DINNER -> {
                 homeViewModel.updateDinner()
+            }
+            MealTime.NOT_SET -> {
+                return
             }
         }
     }

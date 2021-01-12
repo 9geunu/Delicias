@@ -28,16 +28,23 @@ import kotlinx.coroutines.*
 
 class MainActivity : AppCompatActivity() {
     val adapter = PagerAdapter(supportFragmentManager, lifecycle)
-    lateinit var homeFragment: HomeFragment
-    lateinit var favoritesFragment: FavoritesFragment
-    lateinit var mapFragment: MapFragment
-    lateinit var settingFragment: SettingFragment
+    var homeFragment: HomeFragment
+    var favoritesFragment: FavoritesFragment
+    var mapFragment: MapFragment
+    var settingFragment: SettingFragment
     private val GPS_ENABLE_REQUEST_CODE = 2001
     private val PERMISSIONS_REQUEST_CODE = 100
     private var REQUIRED_PERMISSIONS = arrayOf<String>(
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.ACCESS_COARSE_LOCATION
     )
+
+    init {
+        homeFragment = HomeFragment()
+        favoritesFragment = FavoritesFragment()
+        mapFragment = MapFragment()
+        settingFragment = SettingFragment()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
@@ -61,19 +68,15 @@ class MainActivity : AppCompatActivity() {
         override fun createFragment(position: Int): Fragment {
             return when (position) {
                 0 -> {
-                    homeFragment = HomeFragment()
                     homeFragment
                 }
                 1 -> {
-                    favoritesFragment = FavoritesFragment()
                     favoritesFragment
                 }
                 2 -> {
-                    mapFragment = MapFragment()
                     mapFragment
                 }
                 3 -> {
-                    settingFragment = SettingFragment()
                     settingFragment
                 }
                 else -> error("no such position: $position")
