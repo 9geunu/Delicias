@@ -16,6 +16,6 @@ class Converters {
     @TypeConverter
     fun fromArrayList(list: List<Menu>?): String? {
         val gson = Gson()
-        return if (list == null) null else gson.toJson(list)
+        return if (list == null || list.isEmpty()) null else gson.toJson(list)
     }
 }
