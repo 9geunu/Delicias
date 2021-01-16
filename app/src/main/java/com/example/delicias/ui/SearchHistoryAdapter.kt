@@ -25,6 +25,7 @@ import kotlinx.coroutines.runBlocking
 class SearchHistoryAdapter(
     private val repository: RestaurantRepository,
     private val isSearchingNow: LiveData<Boolean>,
+    private val isAutoSaveMode: LiveData<Boolean>,
     private val context: Context) :
     ListAdapter<SearchHistory, SearchHistoryAdapter.ViewHolder>(diffUtil){
     companion object {
@@ -50,38 +51,32 @@ class SearchHistoryAdapter(
             restaurantName.text = searchHistory.name
             searchDate.text = searchHistory.searchDate
 
-            if (isSearchingNow.value == true)
+            if (isSearchingNow.value == true) {
+                searchedDateOrSearchResult.setImageResource(R.drawable.search_circle)
                 deleteOrGo.setImageResource(R.drawable.search_go)
-            else
+                searchDate.visibility = View.INVISIBLE
+            }
+            else {
+                searchedDateOrSearchResult.setImageResource(R.drawable.search_time)
                 deleteOrGo.setImageResource(R.drawable.close)
+                searchDate.visibility = View.VISIBLE
+            }
 
             deleteOrGo.setOnClickListener {
                 runBlocking {
-                    if (isSearchingNow.value == true)
+                    if (isSearchingNow.value == false)
                         repository.deleteSearchHistoryById(searchHistory.id)
                     else {
                         //TODO Move To Map Fragment!!!!
-                        val bundle = Bundle()
-                        bundle.putString("Destination", searchHistory.name)
 
-                        val mapFragment = MapFragment()
-                        mapFragment.arguments = bundle
-
-                        val fragmentManager = (context as AppCompatActivity).supportFragmentManager
-                        val fragmentTransaction = fragmentManager.beginTransaction()
-                        fragmentTransaction.add(0, mapFragment)
-                        fragmentTransaction.commit()
-
-                        val intent = Intent(context, MapFragment::class.java)
-
-                        context.startActivity(intent)
                     }
                 }
             }
 
             layout.setOnClickListener {
                 runBlocking {
-                    repository.insertSearchHistory(searchHistory)
+                    if (isAutoSaveMode.value == true)
+                        repository.insertSearchHistory(searchHistory)
                 }
             }
         }
@@ -89,6 +84,7 @@ class SearchHistoryAdapter(
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
         var layout = itemView.findViewById(R.id.ll_search_history_item) as LinearLayout
+        var searchedDateOrSearchResult = itemView.findViewById(R.id.iv_searched_date_or_search_result) as ImageView
         var restaurantName = itemView.findViewById(R.id.tv_restaurant_name) as TextView
         var searchDate = itemView.findViewById(R.id.tv_search_date) as TextView
         var deleteOrGo = itemView.findViewById(R.id.iv_delete_or_go) as ImageView

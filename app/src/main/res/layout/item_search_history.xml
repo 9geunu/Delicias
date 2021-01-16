@@ -7,6 +7,7 @@
     android:background="#ffffff">
 
     <ImageView
+        android:id="@+id/iv_searched_date_or_search_result"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="12dp"
