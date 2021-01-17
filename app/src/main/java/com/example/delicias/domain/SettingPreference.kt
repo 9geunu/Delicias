@@ -8,5 +8,6 @@ data class SettingPreference(
     @PrimaryKey
     val id: Long,
     var isMenuLessRestaurantHidden: Boolean,
-    var isPushEnabled: Boolean
+    var isPushEnabled: Boolean,
+    var isSearchHistoryAutoSaveMode: Boolean
 )

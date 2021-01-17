@@ -1,6 +1,6 @@
 package com.example.delicias.ui.map
 
-import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -9,35 +9,28 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.SearchView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.delicias.R
 import com.example.delicias.data.repository.RestaurantDataRepository
-import com.example.delicias.data.repository.datasource.LocalRestaurantDataStore
 import com.example.delicias.databinding.FragmentMapBinding
 import com.example.delicias.domain.Menu
 import com.example.delicias.domain.Restaurant
 import com.example.delicias.ui.AnimationOnClickListener
 import com.example.delicias.ui.MenuAdapter
-import com.example.delicias.ui.RestaurantSearchAdapter
+import com.example.delicias.ui.SearchActivity
+import com.example.delicias.util.Constants
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.geometry.LatLngBounds
-import com.naver.maps.map.LocationTrackingMode
-import com.naver.maps.map.NaverMap
-import com.naver.maps.map.OnMapReadyCallback
+import com.naver.maps.map.*
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.Overlay
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.util.FusedLocationSource
-import kotlinx.android.synthetic.main.fragment_map.*
-import kotlinx.android.synthetic.main.layout_map_title.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import java.util.*
@@ -49,7 +42,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private lateinit var naverMap: NaverMap
     lateinit var mapViewModel: MapViewModel
     lateinit var restaurantDataRepository: RestaurantDataRepository
-    lateinit var restaurantSearchAdapter: RestaurantSearchAdapter
     private val executorService = Executors.newSingleThreadExecutor()
     private val handler = Handler(Looper.getMainLooper())
     private var isMapReady = false
@@ -101,7 +93,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val mapTitle: View = binding.mapTitle
         ivSearchRestaurant = (mapTitle as ConstraintLayout).getViewById(R.id.iv_search_restaurant) as ImageView
         ivSearchRestaurant.setOnClickListener {
-            onBackPress()
+            val intent = Intent(activity, SearchActivity::class.java)
+
+            activity?.startActivityForResult(intent, Constants.REQUEST_SEARCH_RESULT)
         }
 
         val fm = childFragmentManager
@@ -175,15 +169,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun setMarkers(naverMap: NaverMap) {
-        Log.d("delitag", "setMarkers")
-
         if (markers.isNotEmpty())
             markers.clear()
 
         if (markers.isEmpty()) {
             runBlocking {
                 restaurantDataRepository.getAllRestaurants().first().forEach { restaurant ->
-                    Log.d("delitag", restaurant.toString())
                     markers.add(Marker().apply {
                         tag = restaurant.id
                         icon = pinImage
@@ -250,6 +241,21 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             in 10..14 -> this.lunch?.menus
             in 15..23 -> this.dinner?.menus
             else -> error("No Such Hour $timeOfDay")
+        }
+    }
+
+    fun goToDestination(restaurantName: String?) {
+        if (restaurantName != null) {
+            runBlocking {
+                restaurantDataRepository.getAllRestaurants().first().filter {
+                    it.name == restaurantName
+                }.forEach {
+                    val restaurant = restaurantDataRepository.getRestaurantById(it.id).first()
+                    val cameraUpdate = CameraUpdate.scrollTo(LatLng(restaurant.latitude, restaurant.longitude))
+                        .animate(CameraAnimation.Easing)
+                    naverMap.moveCamera(cameraUpdate)
+                }
+            }
         }
     }
 }

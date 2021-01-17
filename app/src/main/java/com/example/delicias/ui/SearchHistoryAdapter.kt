@@ -19,13 +19,13 @@ import com.example.delicias.R
 import com.example.delicias.domain.SearchHistory
 import com.example.delicias.domain.repository.RestaurantRepository
 import com.example.delicias.ui.map.MapFragment
+import com.example.delicias.util.Constants
 import kotlinx.coroutines.runBlocking
 
 
 class SearchHistoryAdapter(
     private val repository: RestaurantRepository,
     private val isSearchingNow: LiveData<Boolean>,
-    private val isAutoSaveMode: LiveData<Boolean>,
     private val context: Context) :
     ListAdapter<SearchHistory, SearchHistoryAdapter.ViewHolder>(diffUtil){
     companion object {
@@ -67,16 +67,24 @@ class SearchHistoryAdapter(
                     if (isSearchingNow.value == false)
                         repository.deleteSearchHistoryById(searchHistory.id)
                     else {
-                        //TODO Move To Map Fragment!!!!
+                        repository.insertSearchHistory(searchHistory)
 
+                        val intent = Intent()
+                        intent.putExtra("DestinationRestaurant", searchHistory.name)
+                        (context as AppCompatActivity).setResult(Activity.RESULT_OK, intent)
+                        context.finish()
                     }
                 }
             }
 
             layout.setOnClickListener {
                 runBlocking {
-                    if (isAutoSaveMode.value == true)
-                        repository.insertSearchHistory(searchHistory)
+                    repository.insertSearchHistory(searchHistory)
+
+                    val intent = Intent()
+                    intent.putExtra("DestinationRestaurant", searchHistory.name)
+                    (context as AppCompatActivity).setResult(Activity.RESULT_OK, intent)
+                    context.finish()
                 }
             }
         }

@@ -105,7 +105,8 @@ class RestaurantDataRepository(context: Context) : RestaurantRepository{
     }
 
     override suspend fun insertSettingPreference(settingPreference: SettingPreference) {
-        settingPreferenceDao.insert(settingPreference)
+        if (settingPreferenceDao.getSettingPreference().first() == null)
+            settingPreferenceDao.insert(settingPreference)
     }
 
     override fun isMenuLessRestaurantHidden(): Flow<Boolean> {
@@ -116,6 +117,10 @@ class RestaurantDataRepository(context: Context) : RestaurantRepository{
         return settingPreferenceDao.isPushEnabled()
     }
 
+    override fun isSearchHistoryAutoSaveMode(): Flow<Boolean> {
+        return settingPreferenceDao.isSearchHistoryAutoSaveMode()
+    }
+
     override suspend fun updateIsMenuLessRestaurantHidden(isHidden: Boolean) {
         settingPreferenceDao.updateIsMenuLessRestaurantHidden(isHidden)
     }
@@ -124,8 +129,13 @@ class RestaurantDataRepository(context: Context) : RestaurantRepository{
         settingPreferenceDao.updateIsPushEnabled(isEnabled)
     }
 
+    override suspend fun updateSearchHistoryAutoSaveMode(isAutoSaveMode: Boolean) {
+        settingPreferenceDao.updateSearchHistoryAutoSaveMode(isAutoSaveMode)
+    }
+
     override suspend fun insertSearchHistory(searchHistory: SearchHistory) {
-        searchHistoryDao.insert(searchHistory)
+        if (settingPreferenceDao.isSearchHistoryAutoSaveMode().first())
+            searchHistoryDao.insert(searchHistory)
     }
 
     override fun getAllSearchHistory(): Flow<List<SearchHistory>> {

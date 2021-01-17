@@ -46,7 +46,7 @@ class SettingFragment : Fragment() {
         }
 
         settingViewModel.viewModelScope.launch {
-            settingViewModel.insertSettingPreference(SettingPreference(1, false, false))
+            settingViewModel.insertSettingPreference(SettingPreference(1, false, false, true))
         }
 
         binding.swHideMenulessRestaurant.setOnCheckedChangeListener { button, isChecked ->

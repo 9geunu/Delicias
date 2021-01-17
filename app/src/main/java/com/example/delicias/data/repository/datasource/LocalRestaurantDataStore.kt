@@ -11,7 +11,7 @@ import com.example.delicias.domain.RestaurantMinimal
 import com.example.delicias.domain.SearchHistory
 import com.example.delicias.domain.SettingPreference
 
-@Database(entities = [RestaurantMinimal::class, Restaurant::class, SearchHistory::class, SettingPreference::class], version = 10)
+@Database(entities = [RestaurantMinimal::class, Restaurant::class, SearchHistory::class, SettingPreference::class], version = 11)
 @TypeConverters(Converters::class)
 abstract class LocalRestaurantDataStore : RoomDatabase() {
     abstract fun restaurantDao(): RestaurantDao

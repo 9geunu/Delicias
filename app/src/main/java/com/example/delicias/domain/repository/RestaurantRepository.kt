@@ -35,8 +35,10 @@ interface RestaurantRepository {
     suspend fun insertSettingPreference(settingPreference: SettingPreference)
     fun isMenuLessRestaurantHidden(): Flow<Boolean>
     fun isPushEnabled(): Flow<Boolean>
+    fun isSearchHistoryAutoSaveMode(): Flow<Boolean>
     suspend fun updateIsMenuLessRestaurantHidden(isHidden: Boolean)
     suspend fun updateIsPushEnabled(isEnabled: Boolean)
+    suspend fun updateSearchHistoryAutoSaveMode(isAutoSaveMode: Boolean)
 
     suspend fun insertSearchHistory(searchHistory: SearchHistory)
     fun getAllSearchHistory(): Flow<List<SearchHistory>>

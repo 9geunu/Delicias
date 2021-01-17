@@ -7,10 +7,12 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.PointF
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.View
 import android.view.animation.Interpolator
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import com.example.delicias.R
 import com.example.delicias.databinding.FragmentMapBinding
@@ -38,9 +40,10 @@ class AnimationOnClickListener @JvmOverloads internal constructor(
         val displayMetrics = DisplayMetrics()
         (context as Activity).windowManager.defaultDisplay.getMetrics(displayMetrics)
         height = displayMetrics.heightPixels
-        tvMapTitle = context.findViewById(R.id.tv_map_title)
-        ivSearchRestaurant = context.findViewById(R.id.iv_search_restaurant)
-        ivBackButton = context.findViewById(R.id.iv_map_title_back_button)
+        val mapTitle: View = binding.mapTitle
+        tvMapTitle = (mapTitle as ConstraintLayout).getViewById(R.id.tv_map_title) as TextView
+        ivSearchRestaurant = mapTitle.getViewById(R.id.iv_search_restaurant) as ImageView
+        ivBackButton = mapTitle.getViewById(R.id.iv_map_title_back_button) as ImageView
     }
 
     override fun onClick(v: View?) {

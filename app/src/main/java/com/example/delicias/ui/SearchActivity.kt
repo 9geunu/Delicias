@@ -36,7 +36,7 @@ class SearchActivity : AppCompatActivity(), androidx.appcompat.widget.SearchView
     private lateinit var searchHistoryLiveData: LiveData<List<SearchHistory>>
     private var searchResultLiveData = MutableLiveData<List<SearchHistory>>()
     private var isSearchingNowLiveData = MutableLiveData(false)
-    private var isAutoSaveMode = MutableLiveData(true)
+    private lateinit var isAutoSaveMode: LiveData<Boolean>
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,8 +61,12 @@ class SearchActivity : AppCompatActivity(), androidx.appcompat.widget.SearchView
 
         restaurantDataRepository = RestaurantDataRepository(this)
 
-        binding.tvAutoSaveMode.setOnClickListener {
-            isAutoSaveMode.value = !isAutoSaveMode.value!!
+        isAutoSaveMode = restaurantDataRepository.isSearchHistoryAutoSaveMode().asLiveData()
+
+        binding.tvAutoSaveMode.setOnCheckedChangeListener { buttonView, isChecked ->
+            runBlocking {
+                restaurantDataRepository.updateSearchHistoryAutoSaveMode(isChecked)
+            }
         }
 
         binding.tvDeleteAllHistory.setOnClickListener {
@@ -75,7 +79,7 @@ class SearchActivity : AppCompatActivity(), androidx.appcompat.widget.SearchView
             onBackPressed()
         }
 
-        searchHistoryAdapter = SearchHistoryAdapter(restaurantDataRepository, isSearchingNowLiveData, isAutoSaveMode, this)
+        searchHistoryAdapter = SearchHistoryAdapter(restaurantDataRepository, isSearchingNowLiveData, this)
 
         binding.svSearchRestaurant.setOnQueryTextListener(this)
         binding.svSearchRestaurant.setOnCloseListener(this)
