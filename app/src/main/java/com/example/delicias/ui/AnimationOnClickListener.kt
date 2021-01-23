@@ -7,7 +7,6 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.PointF
 import android.util.DisplayMetrics
-import android.util.Log
 import android.view.View
 import android.view.animation.Interpolator
 import android.widget.ImageView
@@ -16,7 +15,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import com.example.delicias.R
 import com.example.delicias.databinding.FragmentMapBinding
-import com.example.delicias.domain.Restaurant
 import com.naver.maps.map.CameraAnimation
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.NaverMap
@@ -31,7 +29,7 @@ class AnimationOnClickListener @JvmOverloads internal constructor(
 
     private val animatorSet = AnimatorSet()
     private val height: Int
-    private var isRestaurantDetailInfoShown = false
+    var isRestaurantDetailInfoShown = false
     private var tvMapTitle: TextView
     private var ivSearchRestaurant: ImageView
     private var ivBackButton: ImageView
@@ -49,7 +47,7 @@ class AnimationOnClickListener @JvmOverloads internal constructor(
     override fun onClick(v: View?) {
         isRestaurantDetailInfoShown = !isRestaurantDetailInfoShown
 
-        view.visibility = View.GONE
+        view.visibility = View.INVISIBLE
 
         animatorSet.removeAllListeners()
         animatorSet.end()
@@ -69,17 +67,28 @@ class AnimationOnClickListener @JvmOverloads internal constructor(
             .animate(CameraAnimation.None)
         naverMap.moveCamera(cameraUpdate)
 
-        val animator =
+        val animator1 =
             ObjectAnimator.ofFloat(map, "translationY",
                 (if (isRestaurantDetailInfoShown) map.measuredHeight*(-0.4F) else 0F).toFloat())
 
-        animator.duration = 500
-        if (interpolator != null) {
-            animator.interpolator = interpolator
-        }
-        animatorSet.play(animator)
+        val animator2 =
+            ObjectAnimator.ofFloat(binding.btnDefaultLocation, "translationY",
+                (if (isRestaurantDetailInfoShown) map.measuredHeight*(-0.4F) else 0F).toFloat())
 
-        animator.start()
+        animator1.duration = 500
+        if (interpolator != null) {
+            animator1.interpolator = interpolator
+        }
+
+        animator2.duration = 500
+        if (interpolator != null) {
+            animator2.interpolator = interpolator
+        }
+
+        animatorSet.playTogether(animator1, animator2)
+
+        animator1.start()
+        animator2.start()
     }
 
     fun onMapClick(){
@@ -87,8 +96,6 @@ class AnimationOnClickListener @JvmOverloads internal constructor(
             return
 
         isRestaurantDetailInfoShown = !isRestaurantDetailInfoShown
-
-        view.visibility = View.VISIBLE
 
         animatorSet.removeAllListeners()
         animatorSet.end()
@@ -103,15 +110,25 @@ class AnimationOnClickListener @JvmOverloads internal constructor(
             .animate(CameraAnimation.None)
         naverMap.moveCamera(cameraUpdate)
 
-        val animator =
+        val animator1 =
             ObjectAnimator.ofFloat(map, "translationY", 0F)
 
-        animator.duration = 500
+        animator1.duration = 500
         if (interpolator != null) {
-            animator.interpolator = interpolator
+            animator1.interpolator = interpolator
         }
-        animatorSet.play(animator)
 
-        animator.start()
+        val animator2 =
+            ObjectAnimator.ofFloat(binding.btnDefaultLocation, "translationY", 0F)
+
+        animator2.duration = 500
+        if (interpolator != null) {
+            animator2.interpolator = interpolator
+        }
+
+        animatorSet.playTogether(animator1, animator2)
+
+        animator1.start()
+        animator2.start()
     }
 }

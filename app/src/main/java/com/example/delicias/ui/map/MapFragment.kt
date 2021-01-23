@@ -13,7 +13,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.delicias.R
 import com.example.delicias.data.repository.RestaurantDataRepository
@@ -50,22 +50,33 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private var markers = mutableListOf<Marker>()
     private lateinit var animatorListener: AnimationOnClickListener
     private lateinit var ivSearchRestaurant: ImageView
+    private val selectedRestaurantId = MutableLiveData<Long>(0)
+    private lateinit var isSelectedRestaurantFavorite: LiveData<Boolean>
     private val listener = Overlay.OnClickListener { overlay ->
         val marker = overlay as Marker
         Log.d("delitag", "setMarkers: ${marker.tag} 클릭됨")
         runBlocking{
             val restaurant = restaurantDataRepository.getRestaurantById(marker.tag as Long).first()
+            selectedRestaurantId.value = restaurant.id
             binding.restaurant = restaurant
             binding.rvMenuItem.layoutManager = LinearLayoutManager(context)
             binding.rvMenuItem.adapter = MenuAdapter(restaurant.getCurrentMeal())
+
         }
         if (binding.cvRestaurantInfo.isVisible) {
             mapViewModel.setRestaurantInfoInVisible()
             marker.icon = pinImage
+            binding.btnDefaultLocation.translationY = 0F
         }
-        mapViewModel.setRestaurantInfoVisible()
-
-        marker.icon = pinDetailImage
+        else if (animatorListener.isRestaurantDetailInfoShown) {
+            marker.icon = pinImage
+            animatorListener.onMapClick()
+        }
+        else {
+            binding.btnDefaultLocation.translationY = -350F
+            mapViewModel.setRestaurantInfoVisible()
+            marker.icon = pinDetailImage
+        }
 
         markers.filter { otherMarker ->
             otherMarker.tag != marker.tag && otherMarker.icon == pinDetailImage
@@ -89,10 +100,32 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.viewModel = mapViewModel
 
+        binding.btnDefaultLocation.setOnClickListener {
+            val cameraUpdate = CameraUpdate.scrollTo(LatLng(Constants.DEFAULT_LAT, Constants.DEFAULT_LNG))
+                .animate(CameraAnimation.Easing)
+            naverMap.moveCamera(cameraUpdate)
+        }
+
+        isSelectedRestaurantFavorite = Transformations.switchMap(selectedRestaurantId) { id ->
+            restaurantDataRepository.getIsFavoriteOfRestaurant(id).asLiveData()
+        }
+
+        isSelectedRestaurantFavorite.observe(viewLifecycleOwner, androidx.lifecycle.Observer { isFavorite ->
+            binding.btnFavorite.isChecked = isFavorite?: false
+        })
 
         val mapTitle: View = binding.mapTitle
         ivSearchRestaurant = (mapTitle as ConstraintLayout).getViewById(R.id.iv_search_restaurant) as ImageView
         ivSearchRestaurant.setOnClickListener {
+            markers.filter { marker ->
+                marker.icon == pinDetailImage
+            }.forEach { marker ->
+                marker.icon = pinImage
+            }
+
+            if (binding.cvRestaurantInfo.isVisible)
+                mapViewModel.setRestaurantInfoInVisible()
+
             val intent = Intent(activity, SearchActivity::class.java)
 
             activity?.startActivityForResult(intent, Constants.REQUEST_SEARCH_RESULT)
@@ -156,8 +189,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         uiSettings.isLocationButtonEnabled = false
         uiSettings.isZoomControlEnabled = false
 
-        animatorListener = AnimationOnClickListener(requireContext(), binding.clRestaurantInfo, binding.map, naverMap, binding)
-        binding.clRestaurantInfo.setOnClickListener(
+        animatorListener = AnimationOnClickListener(requireContext(), binding.cvRestaurantInfo, binding.map, naverMap, binding)
+        binding.cvRestaurantInfo.setOnClickListener(
             animatorListener
         )
 
@@ -194,11 +227,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
     private fun setNaverMapOnClickListener(naverMap: NaverMap) {
         naverMap.setOnMapClickListener { pointF, latLng ->
-            if (binding.cvRestaurantInfo.isVisible)
+            if (binding.cvRestaurantInfo.isVisible) {
                 mapViewModel.setRestaurantInfoInVisible()
-
-            if (mapViewModel.mapSizePercentage.value == 40F)
-                mapViewModel.setRestaurantDetailInfoInvisible()
+                binding.btnDefaultLocation.translationY = 0F
+            }
 
             markers.filter { marker ->
                 marker.icon == pinDetailImage
@@ -221,15 +253,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             marker.icon = pinImage
         }
 
-        animatorListener.onMapClick()
-
         return if (binding.cvRestaurantInfo.isVisible) {
+            binding.btnDefaultLocation.translationY = 0F
             mapViewModel.setRestaurantInfoInVisible()
             false
-        } else if (mapViewModel.mapSizePercentage.value == 40F) {
-            mapViewModel.setRestaurantDetailInfoInvisible()
+        } else if(animatorListener.isRestaurantDetailInfoShown){
+            animatorListener.onMapClick()
             false
-        } else true
+        }
+        else true
     }
 
     private fun Restaurant.getCurrentMeal(): List<Menu>? {

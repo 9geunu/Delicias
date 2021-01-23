@@ -54,6 +54,12 @@ abstract class RestaurantDao : BaseDao<Restaurant>{
 
     suspend fun updateRestaurantAsNotFavorite(id: Long) = updateIsFavoriteOfRestaurantById(false, id)
 
+    @Query("UPDATE restaurant SET isFavorite = NOT isFavorite WHERE id = :id")
+    abstract suspend fun toggleIsFavoriteOfRestaurantById(id: Long)
+
+    @Query("SELECT isFavorite FROM restaurant WHERE id = :id")
+    abstract fun getIsFavoriteOfRestaurant(id: Long): Flow<Boolean>
+
     @Query("UPDATE restaurant SET distanceOrder = :distanceOrder WHERE id = :id")
     abstract suspend fun updateDistanceOrderOfRestaurantById(id: Long, distanceOrder: Int)
 }

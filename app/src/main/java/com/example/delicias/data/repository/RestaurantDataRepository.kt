@@ -57,6 +57,22 @@ class RestaurantDataRepository(context: Context) : RestaurantRepository{
         restaurantDao.updateDistanceOrderOfRestaurantById(id, distanceOrder)
     }
 
+    override suspend fun updateRestaurantAsFavorite(id: Long) {
+        restaurantDao.updateRestaurantAsFavorite(id)
+    }
+
+    override suspend fun updateRestaurantAsNotFavorite(id: Long) {
+        restaurantDao.updateRestaurantAsNotFavorite(id)
+    }
+
+    override suspend fun toggleIsFavoriteOfRestaurantById(id: Long) {
+        restaurantDao.toggleIsFavoriteOfRestaurantById(id)
+    }
+
+    override fun getIsFavoriteOfRestaurant(id: Long): Flow<Boolean> {
+        return restaurantDao.getIsFavoriteOfRestaurant(id)
+    }
+
     override fun searchForBreakfast(searchquery: String): Flow<List<RestaurantMinimal>> {
         return restaurantDao.searchForBreakfast(searchquery)
     }

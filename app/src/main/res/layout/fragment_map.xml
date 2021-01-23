@@ -174,7 +174,7 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <LinearLayout
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
@@ -186,7 +186,18 @@
                 app:navermap_latitude="37.450050"
                 app:navermap_longitude="126.952497"
                 app:navermap_zoom="16"/>
-        </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/btn_default_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginLeft="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginBottom="40dp"
+                android:src="@drawable/gps"
+                android:background="@drawable/shape_white_circle"/>
+        </FrameLayout>
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cv_restaurant_info"
@@ -219,7 +230,6 @@
                 <ToggleButton
                     android:id="@+id/btn_favorite"
                     android:onClick="@{() -> viewModel.onFavoriteButtonClick(restaurant)}"
-                    android:enabled="@{restaurant.isFavorite}"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     app:layout_constraintTop_toTopOf="parent"
