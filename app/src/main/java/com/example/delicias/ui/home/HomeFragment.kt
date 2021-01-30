@@ -94,7 +94,7 @@ class HomeFragment : Fragment(), SearchView.OnQueryTextListener {
                 id: Long
             ) {
                 if (position == 1){
-                    runBlocking {
+                    scope.launch {
                         Util.sortByLocation(requireContext(), restaurantDataRepository)
                         refresh()
                     }
@@ -109,7 +109,7 @@ class HomeFragment : Fragment(), SearchView.OnQueryTextListener {
 
         binding.srlRefresh.setOnRefreshListener {
             binding.srlRefresh.isRefreshing = true
-            runBlocking {
+            scope.launch {
                 refresh()
                 binding.srlRefresh.isRefreshing = false
             }

@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
     var favoritesFragment: FavoritesFragment
     var mapFragment: MapFragment
     var settingFragment: SettingFragment
+    val scope = CoroutineScope(Dispatchers.IO)
     private val GPS_ENABLE_REQUEST_CODE = 2001
     private val PERMISSIONS_REQUEST_CODE = 100
     private var REQUIRED_PERMISSIONS = arrayOf<String>(
@@ -114,7 +115,7 @@ class MainActivity : AppCompatActivity() {
             super.onPageSelected(position)
             nav_view.selectedItemId = when (position) {
                 0 -> {
-                    runBlocking {
+                    scope.launch {
                         homeFragment.refresh()
                     }
 
@@ -122,7 +123,7 @@ class MainActivity : AppCompatActivity() {
                     R.id.action_home
                 }
                 1 -> {
-                    runBlocking {
+                    scope.launch {
                         favoritesFragment.refresh()
                     }
 

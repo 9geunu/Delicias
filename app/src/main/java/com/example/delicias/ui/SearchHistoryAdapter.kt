@@ -3,7 +3,6 @@ package com.example.delicias.ui
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,9 +17,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.delicias.R
 import com.example.delicias.domain.SearchHistory
 import com.example.delicias.domain.repository.RestaurantRepository
-import com.example.delicias.ui.map.MapFragment
-import com.example.delicias.util.Constants
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class SearchHistoryAdapter(
@@ -37,6 +36,8 @@ class SearchHistoryAdapter(
                 oldItem.id == newItem.id
         }
     }
+    val scope = CoroutineScope(Dispatchers.IO)
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         var inflater = LayoutInflater.from(parent.context)
         var itemView = inflater.inflate(R.layout.item_search_history, parent, false)
@@ -63,7 +64,7 @@ class SearchHistoryAdapter(
             }
 
             deleteOrGo.setOnClickListener {
-                runBlocking {
+                scope.launch {
                     if (isSearchingNow.value == false)
                         repository.deleteSearchHistoryById(searchHistory.id)
                     else {
@@ -78,7 +79,7 @@ class SearchHistoryAdapter(
             }
 
             layout.setOnClickListener {
-                runBlocking {
+                scope.launch {
                     repository.insertSearchHistory(searchHistory)
 
                     val intent = Intent()

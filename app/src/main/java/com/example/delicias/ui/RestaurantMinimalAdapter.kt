@@ -16,7 +16,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.delicias.R
 import com.example.delicias.data.repository.datasource.LocalRestaurantDataStore
 import com.example.delicias.domain.RestaurantMinimal
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class RestaurantMinimalAdapter(val context: Context, val viewModel: ViewModel) :
     ListAdapter<RestaurantMinimal, RestaurantMinimalAdapter.ViewHolder>(diffUtil) {
@@ -30,6 +32,7 @@ class RestaurantMinimalAdapter(val context: Context, val viewModel: ViewModel) :
         }
     }
     private val restaurantDao = LocalRestaurantDataStore.getInstance(context.applicationContext).restaurantDao()
+    val scope = CoroutineScope(Dispatchers.IO)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         var inflater = LayoutInflater.from(parent.context)
@@ -50,12 +53,12 @@ class RestaurantMinimalAdapter(val context: Context, val viewModel: ViewModel) :
 
         holder.favoriteButton.setOnClickListener {
             if (holder.favoriteButton.isChecked){
-                runBlocking {
+                scope.launch {
                     restaurantDao.updateRestaurantAsFavorite(restaurantMinimal.id)
                 }
             }
             else {
-                runBlocking {
+                scope.launch {
                     restaurantDao.updateRestaurantAsNotFavorite(restaurantMinimal.id)
                 }
             }

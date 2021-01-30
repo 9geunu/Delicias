@@ -8,14 +8,18 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.example.delicias.domain.Date
 import com.example.delicias.domain.RestaurantMinimal
 import com.example.delicias.domain.repository.RestaurantRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
 import java.lang.Math.pow
 import java.util.*
 import kotlin.collections.ArrayList
@@ -88,27 +92,30 @@ class Util {
         }
 
         suspend fun sortByLocation(context: Context, repository: RestaurantRepository) {
-            var restaurants = repository.getAllRestaurants().first()
-
-            Collections.sort(restaurants, kotlin.Comparator { left, right ->
+            withContext(Dispatchers.Main) {
+                var restaurants = repository.getAllRestaurants().first()
                 val currentLocation = getLocation(context)
 
-                if (Util.calculateRestaurantDistance
-                        (currentLocation, left.latitude, left.longitude) >
-                    Util.calculateRestaurantDistance
-                        (currentLocation, right.latitude, right.longitude))
-                    return@Comparator 1
-                else if (Util.calculateRestaurantDistance
-                        (currentLocation, left.latitude, left.longitude) <
-                    Util.calculateRestaurantDistance
-                        (currentLocation, right.latitude, right.longitude))
-                    return@Comparator -1
-                else return@Comparator 0
-            })
+                Collections.sort(restaurants, kotlin.Comparator { left, right ->
 
-            val restaurantIterator = restaurants.iterator()
-            for ((index , value) in restaurantIterator.withIndex()) {
-                repository.updateDistanceOrderOfRestaurantById(value.id, index + 1)
+                    Log.d("delitag", "sortByLocation: ${currentLocation?.latitude} ${currentLocation?.longitude}")
+                    if (Util.calculateRestaurantDistance
+                            (currentLocation, left.latitude, left.longitude) >
+                        Util.calculateRestaurantDistance
+                            (currentLocation, right.latitude, right.longitude))
+                        return@Comparator 1
+                    else if (Util.calculateRestaurantDistance
+                            (currentLocation, left.latitude, left.longitude) <
+                        Util.calculateRestaurantDistance
+                            (currentLocation, right.latitude, right.longitude))
+                        return@Comparator -1
+                    else return@Comparator 0
+                })
+
+                val restaurantIterator = restaurants.iterator()
+                for ((index , value) in restaurantIterator.withIndex()) {
+                    repository.updateDistanceOrderOfRestaurantById(value.id, index + 1)
+                }
             }
         }
 
@@ -169,7 +176,8 @@ class Util {
         }
 
         fun calculateRestaurantDistance(currentLocation: Location?, restaurantLat: Double, restaurantLng: Double): Double {
-            return sqrt((currentLocation?.latitude?.minus(restaurantLat)!!).pow(2.0) + currentLocation.longitude.minus(restaurantLng).pow(2.0))
+            return sqrt((currentLocation?.latitude?.minus(restaurantLat)?:0.0).pow(2.0) + (currentLocation?.longitude?.minus(restaurantLng)
+                ?:0.0.pow(2.0)))
         }
     }
 }

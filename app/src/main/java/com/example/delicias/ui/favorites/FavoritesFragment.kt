@@ -84,7 +84,7 @@ class FavoritesFragment : Fragment() {
                 id: Long
             ) {
                 if (position == 1){
-                    runBlocking {
+                    scope.launch {
                         Util.sortByLocation(requireContext(), restaurantDataRepository)
                         refresh()
                     }
@@ -99,7 +99,7 @@ class FavoritesFragment : Fragment() {
 
         binding.srlRefresh.setOnRefreshListener {
             binding.srlRefresh.isRefreshing = true
-            runBlocking {
+            scope.launch {
                 refresh()
                 binding.srlRefresh.isRefreshing = false
             }
