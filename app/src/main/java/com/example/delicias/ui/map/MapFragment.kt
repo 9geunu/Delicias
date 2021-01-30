@@ -31,8 +31,11 @@ import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.Overlay
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.util.FusedLocationSource
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 import java.util.concurrent.Executors
 
@@ -52,28 +55,31 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private lateinit var ivSearchRestaurant: ImageView
     private val selectedRestaurantId = MutableLiveData<Long>(0)
     private lateinit var isSelectedRestaurantFavorite: LiveData<Boolean>
+    private val scope = CoroutineScope(Dispatchers.IO)
     private val listener = Overlay.OnClickListener { overlay ->
         val marker = overlay as Marker
         Log.d("delitag", "setMarkers: ${marker.tag} 클릭됨")
-        runBlocking{
-            val restaurant = restaurantDataRepository.getRestaurantById(marker.tag as Long).first()
-            selectedRestaurantId.value = restaurant.id
-            binding.restaurant = restaurant
-            binding.rvMenuItem.layoutManager = LinearLayoutManager(context)
-            binding.rvMenuItem.adapter = MenuAdapter(restaurant.getCurrentMeal())
 
+        scope.launch{
+            val restaurant = restaurantDataRepository.getRestaurantById(marker.tag as Long).first()
+            withContext(Dispatchers.Main) {
+                selectedRestaurantId.value = restaurant.id
+                binding.restaurant = restaurant
+                binding.rvMenuItem.layoutManager = LinearLayoutManager(context)
+                binding.rvMenuItem.adapter = MenuAdapter(restaurant.getCurrentMeal())
+            }
         }
         if (binding.cvRestaurantInfo.isVisible) {
             mapViewModel.setRestaurantInfoInVisible()
             marker.icon = pinImage
-            binding.btnDefaultLocation.translationY = 0F
+            moveDefaultLocationButtonToBottomOfMap()
         }
         else if (animatorListener.isRestaurantDetailInfoShown) {
             marker.icon = pinImage
             animatorListener.onMapClick()
         }
         else {
-            binding.btnDefaultLocation.translationY = -350F
+            moveDefaultLocationButtonToTopOfInfoCard()
             mapViewModel.setRestaurantInfoVisible()
             marker.icon = pinDetailImage
         }
@@ -117,14 +123,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val mapTitle: View = binding.mapTitle
         ivSearchRestaurant = (mapTitle as ConstraintLayout).getViewById(R.id.iv_search_restaurant) as ImageView
         ivSearchRestaurant.setOnClickListener {
-            markers.filter { marker ->
-                marker.icon == pinDetailImage
-            }.forEach { marker ->
-                marker.icon = pinImage
-            }
+            initializeMarkerIcons()
 
-            if (binding.cvRestaurantInfo.isVisible)
+            if (binding.cvRestaurantInfo.isVisible) {
                 mapViewModel.setRestaurantInfoInVisible()
+                moveDefaultLocationButtonToBottomOfMap()
+            }
 
             val intent = Intent(activity, SearchActivity::class.java)
 
@@ -206,7 +210,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             markers.clear()
 
         if (markers.isEmpty()) {
-            runBlocking {
+            scope.launch {
                 restaurantDataRepository.getAllRestaurants().first().forEach { restaurant ->
                     markers.add(Marker().apply {
                         tag = restaurant.id
@@ -215,12 +219,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                         onClickListener = listener
                     })
                 }
-            }
-        }
 
-        handler.post {
-            markers.forEach { marker ->
-                marker.map = naverMap
+                withContext(Dispatchers.Main) {
+                    markers.forEach { marker ->
+                        marker.map = naverMap
+                    }
+                }
             }
         }
     }
@@ -229,14 +233,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         naverMap.setOnMapClickListener { pointF, latLng ->
             if (binding.cvRestaurantInfo.isVisible) {
                 mapViewModel.setRestaurantInfoInVisible()
-                binding.btnDefaultLocation.translationY = 0F
+                moveDefaultLocationButtonToBottomOfMap()
             }
 
-            markers.filter { marker ->
-                marker.icon == pinDetailImage
-            }.forEach { marker ->
-                marker.icon = pinImage
-            }
+            initializeMarkerIcons()
 
             animatorListener.onMapClick()
         }
@@ -247,14 +247,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     fun onBackPress(): Boolean{
-        markers.filter { marker ->
-            marker.icon == pinDetailImage
-        }.forEach { marker ->
-            marker.icon = pinImage
-        }
+        initializeMarkerIcons()
 
         return if (binding.cvRestaurantInfo.isVisible) {
-            binding.btnDefaultLocation.translationY = 0F
+            moveDefaultLocationButtonToBottomOfMap()
             mapViewModel.setRestaurantInfoInVisible()
             false
         } else if(animatorListener.isRestaurantDetailInfoShown){
@@ -264,21 +260,29 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         else true
     }
 
+    private fun initializeMarkerIcons() {
+        markers.filter { marker ->
+            marker.icon == pinDetailImage
+        }.forEach { marker ->
+            marker.icon = pinImage
+        }
+    }
+
     private fun Restaurant.getCurrentMeal(): List<Menu>? {
         val calendar: Calendar = Calendar.getInstance()
-        val timeOfDay: Int = calendar.get(Calendar.HOUR_OF_DAY)
+        val hourOfDay: Int = calendar.get(Calendar.HOUR_OF_DAY)
 
-        return when (timeOfDay) {
+        return when (hourOfDay) {
             in 0..9 -> this.breakfast?.menus
             in 10..14 -> this.lunch?.menus
             in 15..23 -> this.dinner?.menus
-            else -> error("No Such Hour $timeOfDay")
+            else -> error("No Such Hour $hourOfDay")
         }
     }
 
     fun goToDestination(restaurantName: String?) {
         if (restaurantName != null) {
-            runBlocking {
+            scope.launch {
                 restaurantDataRepository.getAllRestaurants().first().filter {
                     it.name == restaurantName
                 }.forEach {
@@ -289,5 +293,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 }
             }
         }
+    }
+
+    private fun moveDefaultLocationButtonToBottomOfMap() {
+        binding.btnDefaultLocation.translationY = 0F
+    }
+
+    private fun moveDefaultLocationButtonToTopOfInfoCard() {
+        binding.btnDefaultLocation.translationY = -350F
     }
 }

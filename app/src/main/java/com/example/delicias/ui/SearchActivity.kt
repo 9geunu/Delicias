@@ -1,10 +1,10 @@
 package com.example.delicias.ui
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
@@ -19,9 +19,8 @@ import com.example.delicias.R
 import com.example.delicias.data.repository.RestaurantDataRepository
 import com.example.delicias.databinding.ActivitySearchBinding
 import com.example.delicias.domain.SearchHistory
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -37,7 +36,7 @@ class SearchActivity : AppCompatActivity(), androidx.appcompat.widget.SearchView
     private var searchResultLiveData = MutableLiveData<List<SearchHistory>>()
     private var isSearchingNowLiveData = MutableLiveData(false)
     private lateinit var isAutoSaveMode: LiveData<Boolean>
-
+    private val scope = CoroutineScope(Dispatchers.IO)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
@@ -64,13 +63,13 @@ class SearchActivity : AppCompatActivity(), androidx.appcompat.widget.SearchView
         isAutoSaveMode = restaurantDataRepository.isSearchHistoryAutoSaveMode().asLiveData()
 
         binding.tvAutoSaveMode.setOnCheckedChangeListener { buttonView, isChecked ->
-            runBlocking {
+            scope.launch {
                 restaurantDataRepository.updateSearchHistoryAutoSaveMode(isChecked)
             }
         }
 
         binding.tvDeleteAllHistory.setOnClickListener {
-            runBlocking {
+            scope.launch {
                 restaurantDataRepository.deleteAllSearchHistory()
             }
         }
@@ -94,25 +93,33 @@ class SearchActivity : AppCompatActivity(), androidx.appcompat.widget.SearchView
                 binding.tvSearchResult.text = "최근 검색 결과"
 
                 val searchHistoriesFlow = restaurantDataRepository.getAllSearchHistory()
-                val searchHistoryList: List<SearchHistory>
-                runBlocking {
+                var searchHistoryList: List<SearchHistory> = listOf()
+                val job = scope.launch {
                     searchHistoryList = searchHistoriesFlow.first()
+
+                    withContext(Dispatchers.Main) {
+                        if (searchHistoryList.isNullOrEmpty() && isAutoSaveMode.value == true) {
+                            binding.tvSearchResult.visibility = View.GONE
+                            binding.tvStatusInfo.visibility = View.VISIBLE
+                            binding.tvStatusInfo.text = "최근 검색 내역이 없습니다."
+                        }
+                        else if (searchHistoryList.isNullOrEmpty() && isAutoSaveMode.value == false) {
+                            binding.tvSearchResult.visibility = View.GONE
+                            binding.tvStatusInfo.visibility = View.VISIBLE
+                            binding.tvStatusInfo.text = "최근 검색 저장 기능이 꺼져있습니다."
+                        }
+                        else {
+                            binding.tvSearchResult.visibility = View.VISIBLE
+                            binding.tvSearchResult.text = "최근 검색 결과"
+                            binding.tvStatusInfo.visibility = View.GONE
+                        }
+                    }
                 }
 
-                if (searchHistoryList.isNullOrEmpty() && isAutoSaveMode.value == true) {
-                    binding.tvSearchResult.visibility = View.GONE
-                    binding.tvStatusInfo.visibility = View.VISIBLE
-                    binding.tvStatusInfo.text = "최근 검색 내역이 없습니다."
-                }
-                else if (searchHistoryList.isNullOrEmpty() && isAutoSaveMode.value == false) {
-                    binding.tvSearchResult.visibility = View.GONE
-                    binding.tvStatusInfo.visibility = View.VISIBLE
-                    binding.tvStatusInfo.text = "최근 검색 저장 기능이 꺼져있습니다."
-                }
-                else {
-                    binding.tvSearchResult.visibility = View.VISIBLE
-                    binding.tvSearchResult.text = "최근 검색 결과"
-                    binding.tvStatusInfo.visibility = View.GONE
+                scope.launch {
+                    withContext(Dispatchers.Main) {
+                        job.join()
+                    }
                 }
                 searchHistoriesFlow.asLiveData()
             }
@@ -121,6 +128,7 @@ class SearchActivity : AppCompatActivity(), androidx.appcompat.widget.SearchView
                     binding.tvStatusInfo.visibility = View.GONE
                 }
                 binding.llSearchBottomBar.visibility = View.GONE
+                binding.tvSearchResult.visibility = View.VISIBLE
                 binding.tvSearchResult.text = "검색 결과"
                 searchResultLiveData
             }
@@ -142,36 +150,10 @@ class SearchActivity : AppCompatActivity(), androidx.appcompat.widget.SearchView
 
         isAutoSaveMode.observe(this, { isAutoSaveModeNow ->
             if (isAutoSaveModeNow) {
-                binding.tvAutoSaveMode.text = "자동저장 끄기"
-                binding.llVerticalDivide.visibility = View.VISIBLE
-                binding.tvDeleteAllHistory.visibility = View.VISIBLE
-
-                val searchHistoriesFlow = restaurantDataRepository.getAllSearchHistory()
-                val searchHistoryList: List<SearchHistory>
-                runBlocking {
-                    searchHistoryList = searchHistoriesFlow.first()
-                }
-
-                if (searchHistoryList.isNullOrEmpty()) {
-                    binding.tvSearchResult.visibility = View.GONE
-                    binding.tvStatusInfo.visibility = View.VISIBLE
-                    binding.tvStatusInfo.text = "최근 검색 내역이 없습니다."
-                }
-                else {
-                    binding.tvSearchResult.visibility = View.VISIBLE
-                    binding.tvStatusInfo.visibility = View.GONE
-                }
+                autoSaveModeOn()
             }
             else {
-                binding.tvAutoSaveMode.text = "자동저장 켜기"
-                binding.llVerticalDivide.visibility = View.INVISIBLE
-                binding.tvDeleteAllHistory.visibility = View.INVISIBLE
-                binding.tvSearchResult.visibility = View.GONE
-                binding.tvStatusInfo.visibility = View.VISIBLE
-                binding.tvStatusInfo.text = "최근 검색 저장 기능이 꺼져있습니다."
-                runBlocking {
-                    restaurantDataRepository.deleteAllSearchHistory()
-                }
+                autoSaveModeOff()
             }
         })
 
@@ -204,9 +186,9 @@ class SearchActivity : AppCompatActivity(), androidx.appcompat.widget.SearchView
         if (newText.isEmpty())
             return
 
-        runBlocking {
+        scope.launch {
             if (searchResultLiveData.value == null)
-                searchResultLiveData.value = emptyList()
+                searchResultLiveData.postValue(emptyList())
 
             val searchedRestaurants = restaurantDataRepository.searchRestaurant(queryText).first()
             val searchHistoryList = ArrayList<SearchHistory>()
@@ -230,5 +212,40 @@ class SearchActivity : AppCompatActivity(), androidx.appcompat.widget.SearchView
 
     private fun searchingModeOff(){
         isSearchingNowLiveData.value = false
+    }
+
+    private fun autoSaveModeOn(){
+        binding.tvAutoSaveMode.text = "자동저장 끄기"
+        binding.llVerticalDivide.visibility = View.VISIBLE
+        binding.tvDeleteAllHistory.visibility = View.VISIBLE
+
+        val searchHistoriesFlow = restaurantDataRepository.getAllSearchHistory()
+        var searchHistoryList: List<SearchHistory> = listOf()
+        scope.launch {
+            searchHistoryList = searchHistoriesFlow.first()
+            withContext(Dispatchers.Main) {
+                if (searchHistoryList.isNullOrEmpty()) {
+                    binding.tvSearchResult.visibility = View.GONE
+                    binding.tvStatusInfo.visibility = View.VISIBLE
+                    binding.tvStatusInfo.text = "최근 검색 내역이 없습니다."
+                }
+                else {
+                    binding.tvSearchResult.visibility = View.VISIBLE
+                    binding.tvStatusInfo.visibility = View.GONE
+                }
+            }
+        }
+    }
+
+    private fun autoSaveModeOff(){
+        binding.tvAutoSaveMode.text = "자동저장 켜기"
+        binding.llVerticalDivide.visibility = View.INVISIBLE
+        binding.tvDeleteAllHistory.visibility = View.INVISIBLE
+        binding.tvSearchResult.visibility = View.GONE
+        binding.tvStatusInfo.visibility = View.VISIBLE
+        binding.tvStatusInfo.text = "최근 검색 저장 기능이 꺼져있습니다."
+        scope.launch {
+            restaurantDataRepository.deleteAllSearchHistory()
+        }
     }
 }
