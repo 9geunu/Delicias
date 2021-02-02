@@ -125,11 +125,26 @@ class HomeFragment : Fragment(), SearchView.OnQueryTextListener {
 
         restaurantMinimalLiveData.observe(
             lifecycleOwner,
-            androidx.lifecycle.Observer {
-                restaurantMinimalAdapter.submitList(it)
+            androidx.lifecycle.Observer { restaurantList ->
+                if (restaurantList.isEmpty())
+                    showEmptyInfo()
+                else {
+                    hideEmptyInfo()
+                }
+                restaurantMinimalAdapter.submitList(restaurantList)
             })
 
         return binding.root
+    }
+
+    private fun hideEmptyInfo() {
+        binding.ivEmptyRestaurants.visibility = View.INVISIBLE
+        binding.tvEmptyRestaurants.visibility = View.INVISIBLE
+    }
+
+    private fun showEmptyInfo() {
+        binding.ivEmptyRestaurants.visibility = View.VISIBLE
+        binding.tvEmptyRestaurants.visibility = View.VISIBLE
     }
 
     suspend fun refresh() {

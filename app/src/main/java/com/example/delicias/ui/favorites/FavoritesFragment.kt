@@ -1,7 +1,6 @@
 package com.example.delicias.ui.favorites
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import com.example.delicias.R
 import com.example.delicias.data.repository.RestaurantDataRepository
-import com.example.delicias.data.repository.datasource.LocalRestaurantDataStore
 import com.example.delicias.databinding.FragmentFavoritesBinding
 import com.example.delicias.domain.Date
 import com.example.delicias.domain.MealTime
@@ -25,8 +23,6 @@ import com.example.delicias.ui.MealTimeAdapter
 import com.example.delicias.ui.RestaurantMinimalAdapter
 import com.example.delicias.util.Util
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.first
-import java.util.*
 import kotlin.collections.ArrayList
 
 class FavoritesFragment : Fragment() {
@@ -115,11 +111,26 @@ class FavoritesFragment : Fragment() {
 
         restaurantMinimalLiveData.observe(
             lifecycleOwner,
-            androidx.lifecycle.Observer {
-                restaurantMinimalAdapter.submitList(it)
+            androidx.lifecycle.Observer { restaurantList ->
+                if (restaurantList.isEmpty())
+                    showEmptyInfo()
+                else {
+                    hideEmptyInfo()
+                }
+                restaurantMinimalAdapter.submitList(restaurantList)
             })
 
         return binding.root
+    }
+
+    private fun hideEmptyInfo() {
+        binding.ivEmptyFavoriteRestaurants.visibility = View.INVISIBLE
+        binding.tvEmptyFavoriteRestaurants.visibility = View.INVISIBLE
+    }
+
+    private fun showEmptyInfo() {
+        binding.ivEmptyFavoriteRestaurants.visibility = View.VISIBLE
+        binding.tvEmptyFavoriteRestaurants.visibility = View.VISIBLE
     }
 
     suspend fun refresh() {
