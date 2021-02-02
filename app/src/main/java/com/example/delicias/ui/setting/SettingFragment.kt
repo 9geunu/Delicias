@@ -1,12 +1,10 @@
 package com.example.delicias.ui.setting
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -16,10 +14,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.delicias.R
 import com.example.delicias.data.repository.RestaurantDataRepository
 import com.example.delicias.databinding.FragmentSettingBinding
-import com.example.delicias.domain.SearchHistory
 import com.example.delicias.domain.SettingPreference
 import com.example.delicias.ui.DevelopersActivity
-import com.example.delicias.ui.MainActivity
+import com.example.delicias.ui.notification.NotificationCenterActivity
 import kotlinx.coroutines.launch
 
 class SettingFragment : Fragment() {
@@ -62,6 +59,12 @@ class SettingFragment : Fragment() {
             settingViewModel.viewModelScope.launch {
                 settingViewModel.updateIsMenuLessRestaurantHidden(isChecked)
             }
+        }
+
+        binding.llNotice.setOnClickListener {
+            val intent = Intent(activity, NotificationCenterActivity::class.java)
+
+            activity?.startActivity(intent)
         }
 
         return binding.root

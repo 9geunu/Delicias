@@ -15,11 +15,15 @@
         android:roundIcon="@mipmap/app_logo_3"
         android:supportsRtl="true"
         android:theme="@style/SplashTheme">
-        <activity android:name=".ui.SearchActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".ui.DevelopersActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".ui.MainActivity"
+        <activity android:name=".ui.notification.NotificationCenterActivity"></activity>
+        <activity
+            android:name=".ui.SearchActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.DevelopersActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.MainActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
