@@ -8,17 +8,21 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Lifecycle
+import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.delicias.R
 import com.example.delicias.databinding.ActivityNotificationCenterBinding
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
+import com.google.android.material.tabs.TabLayoutMediator
 
 
 class NotificationCenterActivity : AppCompatActivity() {
     lateinit var binding: ActivityNotificationCenterBinding
     private lateinit var ivBackButton: ImageView
     private lateinit var tvTitle: TextView
-    private lateinit var notificationFragment: Fragment
+    private val tabLayoutTextArray = arrayOf("알림","공지사항")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
@@ -39,27 +43,23 @@ class NotificationCenterActivity : AppCompatActivity() {
         }
 
         val tabs = binding.tabs
+        val viewPager = binding.pager
 
-        tabs.addTab(tabs.newTab().setText("알림"))
-        tabs.addTab(tabs.newTab().setText("공지사항"))
+        viewPager.adapter = NotificationCenterFragmentAdapter(supportFragmentManager, lifecycle)
 
-        notificationFragment = NotificationFragment()
+        TabLayoutMediator(tabs, viewPager) { tab, position ->
+            tab.text = tabLayoutTextArray[position]
+        }.attach()
+    }
 
-        tabs.addOnTabSelectedListener(object : OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab) {
-                val position = tab.position
-                var selected: Fragment? = null
-
-                if (position == 0) selected = notificationFragment
-                else if (position == 1) selected = notificationFragment
-
-                if (selected != null) {
-                    supportFragmentManager.beginTransaction().replace(R.id.container, selected).commit()
-                }
+    inner class NotificationCenterFragmentAdapter(fm: FragmentManager, lc: Lifecycle): FragmentStateAdapter(fm, lc) {
+        override fun getItemCount() = 2
+        override fun createFragment(position: Int): Fragment {
+            return when (position) {
+                0 -> NotificationFragment()
+                1 -> NoticeFragment()
+                else -> error("no such position: $position")
             }
-
-            override fun onTabUnselected(tab: TabLayout.Tab) {}
-            override fun onTabReselected(tab: TabLayout.Tab) {}
-        })
+        }
     }
 }
