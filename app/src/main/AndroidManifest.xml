@@ -15,7 +15,8 @@
         android:roundIcon="@mipmap/app_logo_3"
         android:supportsRtl="true"
         android:theme="@style/SplashTheme">
-        <activity android:name=".ui.notification.NotificationCenterActivity"></activity>
+        <activity android:name=".ui.notification.NotificationDetailActivity"></activity>
+        <activity android:name=".ui.notification.NotificationCenterActivity" />
         <activity
             android:name=".ui.SearchActivity"
             android:screenOrientation="portrait" />

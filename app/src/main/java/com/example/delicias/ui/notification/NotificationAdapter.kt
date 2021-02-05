@@ -1,5 +1,7 @@
 package com.example.delicias.ui.notification
 
+import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,8 +12,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.delicias.R
 import com.example.delicias.domain.Notification
+import com.example.delicias.util.Constants
 
-class NotificationAdapter() : ListAdapter<Notification, NotificationAdapter.ViewHolder>(diffUtil){
+class NotificationAdapter(private val context: Context) : ListAdapter<Notification, NotificationAdapter.ViewHolder>(diffUtil){
     companion object {
         val diffUtil = object: DiffUtil.ItemCallback<Notification>() {
             override fun areContentsTheSame(oldItem: Notification, newItem: Notification) =
@@ -33,11 +36,18 @@ class NotificationAdapter() : ListAdapter<Notification, NotificationAdapter.View
         val notification = getItem(position)
 
         with(holder) {
-            title.text = notification.notificationSummary
+            title.text = notification.summary
             date.text = notification.date
 
             layout.setOnClickListener {
+                val intent = Intent(context, NotificationDetailActivity::class.java)
 
+                intent.putExtra(Constants.NOTIFICATION_SUMMARY, notification.summary)
+                    .putExtra(Constants.NOTIFICATION_TITLE, notification.title)
+                    .putExtra(Constants.NOTIFICATION_DATE, notification.date)
+                    .putExtra(Constants.NOTIFICATION_BODY, notification.body)
+
+                context.startActivity(intent)
             }
         }
     }
