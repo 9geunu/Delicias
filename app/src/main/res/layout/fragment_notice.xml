@@ -6,11 +6,15 @@
         android:layout_height="match_parent"
         tools:context=".ui.notification.NoticeFragment">
 
-        <!-- TODO: Update blank fragment layout -->
-        <TextView
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="" />
+            android:layout_height="match_parent">
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_notices"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:listitem="@layout/item_notice"/>
+        </androidx.core.widget.NestedScrollView>
     </FrameLayout>
 </layout>
