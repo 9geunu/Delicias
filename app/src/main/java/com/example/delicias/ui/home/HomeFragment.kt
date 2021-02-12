@@ -26,12 +26,13 @@ import com.example.delicias.ui.DateAdapter
 import com.example.delicias.ui.MealTimeAdapter
 import com.example.delicias.ui.RestaurantMinimalAdapter
 import com.example.delicias.util.Util
+import com.google.android.material.appbar.AppBarLayout
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
 import java.util.*
 
 
-class HomeFragment : Fragment(), SearchView.OnQueryTextListener {
+class HomeFragment : Fragment(), SearchView.OnQueryTextListener, AppBarLayout.OnOffsetChangedListener {
     lateinit var homeViewModel: HomeViewModel
     lateinit var restaurantMinimalAdapter: RestaurantMinimalAdapter
     var dateData = MutableLiveData<ArrayList<Date>>()
@@ -236,5 +237,18 @@ class HomeFragment : Fragment(), SearchView.OnQueryTextListener {
         }
     }
 
+    override fun onOffsetChanged(appBarLayout: AppBarLayout?, verticalOffset: Int) {
+        binding.srlRefresh.isEnabled = verticalOffset == 0
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.AppBarLayout.addOnOffsetChangedListener(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        binding.AppBarLayout.removeOnOffsetChangedListener(this)
+    }
 
 }

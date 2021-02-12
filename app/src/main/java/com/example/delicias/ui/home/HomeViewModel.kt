@@ -30,18 +30,6 @@ class HomeViewModel(private val repository: RestaurantRepository) : ViewModel(){
         repository.updateDinner()
     }
 
-    fun searchForBreakfast(query: String): LiveData<List<RestaurantMinimal>>{
-        return repository.searchForBreakfast(query).asLiveData(viewModelScope.coroutineContext)
-    }
-
-    fun searchForLunch(query: String): LiveData<List<RestaurantMinimal>>{
-        return repository.searchForLunch(query).asLiveData(viewModelScope.coroutineContext)
-    }
-
-    fun searchForDinner(query: String): LiveData<List<RestaurantMinimal>>{
-        return repository.searchForDinner(query).asLiveData(viewModelScope.coroutineContext)
-    }
-
     fun getRestaurantMinimalOrderByName(): LiveData<List<RestaurantMinimal>> {
         return repository.getRestaurantMinimalOrderByName().asLiveData(viewModelScope.coroutineContext)
     }
